@@ -3,7 +3,7 @@ package controllers;
 import models.DBConnection;
 import views.LoginView;
 import views.AdminDashboard;
-import views.EmployeeDashboard;
+import views.EmployeeDashboardView;
 
 import javax.swing.*;
 import java.sql.*;
@@ -15,9 +15,8 @@ public class LoginController {
     public LoginController(LoginView view) {
         this.view = view;
 
-        // Attach button listeners
-        view.getLoginButton().addActionListener(e -> handleLogin());
-        view.getExitButton().addActionListener(e -> System.exit(0));
+        view.getLoginButton().addActionListener(_ -> handleLogin());
+        view.getExitButton().addActionListener(_ -> System.exit(0));
     }
 
     private void handleLogin() {
@@ -26,7 +25,7 @@ public class LoginController {
         String password = view.getPassword();
 
         if (username.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(view, "Please enter all fields.");
+            showStyledMessage("Please enter all fields.", "Missing Information", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -41,25 +40,33 @@ public class LoginController {
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                JOptionPane.showMessageDialog(view, "✅ Login successful as " + role + "!");
+                showStyledMessage("✅ Login successful as " + role + "!", "Success", JOptionPane.INFORMATION_MESSAGE);
 
-                // Open dashboard based on role
                 if (role.equals("Admin")) {
                     new AdminDashboard().setVisible(true);
                 } else {
-                    int empId = rs.getInt("emp_id");  // Make sure `emp_id` exists in your employee table
-                    new EmployeeDashboard(empId).setVisible(true);
+                    String firstName = rs.getString("first_name");
+                    String lastName = rs.getString("last_name");
+                    String empName = firstName + " " + lastName;
+
+                    new EmployeeDashboardView(empName).setVisible(true);
                 }
 
                 view.dispose(); // Close the login window
             } else {
-                JOptionPane.showMessageDialog(view, "❌ Invalid credentials.");
+                showStyledMessage("❌ Invalid credentials.", "Login Failed", JOptionPane.ERROR_MESSAGE);
             }
 
             rs.close();
             stmt.close();
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(view, "DB error: " + ex.getMessage());
+            showStyledMessage("❌ DB error: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private void showStyledMessage(String message, String title, int messageType) {
+        UIManager.put("OptionPane.messageForeground", new java.awt.Color(0, 121, 107)); // teal/dark green
+        UIManager.put("Panel.background", java.awt.Color.white);
+        JOptionPane.showMessageDialog(view, message, title, messageType);
     }
 }
