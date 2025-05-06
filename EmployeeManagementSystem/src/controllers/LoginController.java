@@ -47,9 +47,12 @@ public class LoginController {
                 } else {
                     String firstName = rs.getString("first_name");
                     String lastName = rs.getString("last_name");
+                    int empId = rs.getInt("emp_id");
                     String empName = firstName + " " + lastName;
 
-                    new EmployeeDashboardView(empName).setVisible(true);
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+                        new controllers.EmployeeDashboardController(empName, empId);
+                    });
                 }
 
                 view.dispose(); // Close the login window

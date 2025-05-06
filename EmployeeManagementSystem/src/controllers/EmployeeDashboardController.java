@@ -1,6 +1,9 @@
 package controllers;
 
 import views.EmployeeDashboardView;
+import views.EmployeeProfileView;
+import models.EmployeeModel;
+import controllers.EmployeeProfileController;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -10,35 +13,52 @@ import java.time.format.DateTimeFormatter;
 
 public class EmployeeDashboardController {
     private EmployeeDashboardView view;
-
     private Timer timer;
     private int workingSeconds = 0;
     private int breakSeconds = 0;
     private boolean onBreak = false;
-
     private String employeeName;
+    private int empId; // Employee ID passed for profile data
 
-    public EmployeeDashboardController(String employeeName) {
+    private EmployeeProfileView profileView; // Reference to profile view
+    private EmployeeProfileController profileController; // Reference to profile controller
+
+    public EmployeeDashboardController(String employeeName, int empId) {
         this.employeeName = employeeName;
+        this.empId = empId;
+
+        // Initialize the main dashboard view and the profile view
         view = new EmployeeDashboardView(employeeName);
+        profileView = new EmployeeProfileView(empId); // Initialize profile view with employee ID
+        profileController = new EmployeeProfileController(profileView, empId); // Initialize profile controller
+
+        // Add the profile view panel to CardLayout
+        view.contentPanel.add(profileView, "My Profile");
+
         initController();
         view.setVisible(true);
-        startTimers(); // Start the real-time timers
+        startTimers(); // Start working timer
     }
 
     private void initController() {
         view.logoutBtn.addActionListener(_ -> handleLogout());
 
+        // Handle Dashboard button click
         view.dashboardBtn.addActionListener(e -> {
             view.cardLayout.show(view.contentPanel, "Dashboard");
         });
 
-        // Add placeholders for future views
-        view.profileBtn.addActionListener(_ -> JOptionPane.showMessageDialog(null, "Profile View (Coming Soon)"));
+        // Handle Profile button click
+        view.profileBtn.addActionListener(e -> {
+            profileController.openProfileWindow(); // Open profile in new window
+        });
+
+        // Placeholder buttons for future functionality
         view.leaveBtn.addActionListener(_ -> JOptionPane.showMessageDialog(null, "Leave View (Coming Soon)"));
         view.salaryBtn.addActionListener(_ -> JOptionPane.showMessageDialog(null, "Salary View (Coming Soon)"));
         view.settingBtn.addActionListener(_ -> JOptionPane.showMessageDialog(null, "Setting View (Coming Soon)"));
 
+        // Break timer functionality
         view.startBreakBtn.addActionListener(_ -> onBreak = true);
         view.endBreakBtn.addActionListener(_ -> onBreak = false);
     }
