@@ -9,6 +9,10 @@ public class EmployeeDashboardView extends JFrame {
     public JLabel welcomeLabel, nameLabel;
     public JButton dashboardBtn, profileBtn, leaveBtn, salaryBtn, settingBtn, logoutBtn;
 
+    // Timer UI elements
+    public JLabel workingTimeLabel, breakTimeLabel;
+    public JButton startBreakBtn, endBreakBtn;
+
     public EmployeeDashboardView(String employeeName) {
         // Frame setup
         setTitle("Employee Dashboard");
@@ -32,7 +36,7 @@ public class EmployeeDashboardView extends JFrame {
         JButton[] navButtons = {dashboardBtn, profileBtn, salaryBtn, leaveBtn, settingBtn};
         for (JButton btn : navButtons) {
             sidebarPanel.add(btn);
-            sidebarPanel.add(Box.createVerticalStrut(10)); // spacing
+            sidebarPanel.add(Box.createVerticalStrut(10));
         }
 
         add(sidebarPanel, BorderLayout.WEST);
@@ -48,7 +52,7 @@ public class EmployeeDashboardView extends JFrame {
 
         logoutBtn = new JButton("Log Out");
         logoutBtn.setFocusPainted(false);
-        logoutBtn.setBackground(new Color(211, 47, 47)); // Red
+        logoutBtn.setBackground(new Color(211, 47, 47));
         logoutBtn.setForeground(Color.WHITE);
         logoutBtn.setFont(new Font("SansSerif", Font.BOLD, 12));
         logoutBtn.setMargin(new Insets(5, 15, 5, 15));
@@ -65,30 +69,41 @@ public class EmployeeDashboardView extends JFrame {
         add(topBarPanel, BorderLayout.NORTH);
 
         // Content Panel
-        contentPanel = new JPanel();
-        contentPanel.setLayout(new GridBagLayout());
+        contentPanel = new JPanel(new GridBagLayout());
         contentPanel.setBackground(Color.WHITE);
 
-        JPanel card = new JPanel();
-        card.setPreferredSize(new Dimension(300, 100));
-        card.setBackground(new Color(240, 240, 240));
-        card.setLayout(new BorderLayout());
-        card.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
+        JPanel timerPanel = new JPanel();
+        timerPanel.setPreferredSize(new Dimension(350, 220));
+        timerPanel.setBackground(new Color(240, 240, 240));
+        timerPanel.setLayout(new GridLayout(6, 1, 5, 5));
+        timerPanel.setBorder(BorderFactory.createTitledBorder("Work Session Info"));
 
-        JLabel welcomeMsg = new JLabel("Welcome Back", SwingConstants.CENTER);
-        welcomeMsg.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        JLabel nameDisplay = new JLabel(employeeName, SwingConstants.CENTER);
+        nameDisplay.setFont(new Font("SansSerif", Font.BOLD, 18));
+        nameDisplay.setForeground(new Color(28, 43, 54));
 
-        nameLabel = new JLabel(employeeName, SwingConstants.CENTER);
-        nameLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
+        workingTimeLabel = new JLabel("Working Time: 00:00:00", SwingConstants.CENTER);
+        workingTimeLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
 
-        JPanel msgPanel = new JPanel(new GridLayout(2, 1));
-        msgPanel.setBackground(new Color(240, 240, 240));
-        msgPanel.add(welcomeMsg);
-        msgPanel.add(nameLabel);
+        breakTimeLabel = new JLabel("Break Time: 00:00:00", SwingConstants.CENTER);
+        breakTimeLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
 
-        card.add(msgPanel, BorderLayout.CENTER);
+        startBreakBtn = new JButton("Start Break");
+        endBreakBtn = new JButton("End Break");
 
-        contentPanel.add(card);
+        // Style buttons
+        styleTimerButton(startBreakBtn);
+        styleTimerButton(endBreakBtn);
+
+        timerPanel.add(Box.createVerticalStrut(10));
+        timerPanel.add(nameDisplay);
+        timerPanel.add(workingTimeLabel);
+        timerPanel.add(breakTimeLabel);
+        timerPanel.add(startBreakBtn);
+        timerPanel.add(endBreakBtn);
+
+        contentPanel.add(timerPanel);
+
         add(contentPanel, BorderLayout.CENTER);
     }
 
@@ -101,5 +116,13 @@ public class EmployeeDashboardView extends JFrame {
         button.setForeground(Color.WHITE);
         button.setFont(new Font("SansSerif", Font.BOLD, 13));
         return button;
+    }
+
+    private void styleTimerButton(JButton button) {
+        button.setFocusPainted(false);
+        button.setBackground(new Color(100, 181, 246));
+        button.setForeground(Color.BLACK);
+        button.setFont(new Font("SansSerif", Font.BOLD, 13));
+        button.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
     }
 }
