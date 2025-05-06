@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "type": "java",
+        "name": "Launch EMS App",
+        "request": "launch",
+        "mainClass": "app.App",
+        "vmArgs": "-cp \"lib/mysql-connector-j-8.4.0.jar;src\""
+      }
+      
+    ]
+  }
+  

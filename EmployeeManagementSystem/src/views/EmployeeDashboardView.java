@@ -2,16 +2,20 @@ package views;
 
 import javax.swing.*;
 import java.awt.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class EmployeeDashboardView extends JFrame {
-
     public JPanel sidebarPanel, contentPanel, topBarPanel;
     public JLabel welcomeLabel, nameLabel;
     public JButton dashboardBtn, profileBtn, leaveBtn, salaryBtn, settingBtn, logoutBtn;
 
     // Timer UI elements
-    public JLabel workingTimeLabel, breakTimeLabel;
+    public JLabel workingTimeLabel, breakTimeLabel, dateLabel;
     public JButton startBreakBtn, endBreakBtn;
+
+    public CardLayout cardLayout;
+    public JPanel dashboardCard;
 
     public EmployeeDashboardView(String employeeName) {
         // Frame setup
@@ -55,8 +59,6 @@ public class EmployeeDashboardView extends JFrame {
         logoutBtn.setBackground(new Color(211, 47, 47));
         logoutBtn.setForeground(Color.WHITE);
         logoutBtn.setFont(new Font("SansSerif", Font.BOLD, 12));
-        logoutBtn.setMargin(new Insets(5, 15, 5, 15));
-        logoutBtn.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         logoutBtn.setPreferredSize(new Dimension(100, 35));
 
         JPanel logoutPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 7));
@@ -65,22 +67,29 @@ public class EmployeeDashboardView extends JFrame {
 
         topBarPanel.add(welcomeLabel, BorderLayout.WEST);
         topBarPanel.add(logoutPanel, BorderLayout.EAST);
-
         add(topBarPanel, BorderLayout.NORTH);
 
-        // Content Panel
-        contentPanel = new JPanel(new GridBagLayout());
+        // Content Panel with CardLayout
+        cardLayout = new CardLayout();
+        contentPanel = new JPanel(cardLayout);
         contentPanel.setBackground(Color.WHITE);
 
+        // Dashboard Card
+        dashboardCard = new JPanel(new GridBagLayout());
+        dashboardCard.setBackground(Color.WHITE);
+
         JPanel timerPanel = new JPanel();
-        timerPanel.setPreferredSize(new Dimension(350, 220));
+        timerPanel.setPreferredSize(new Dimension(350, 240));
         timerPanel.setBackground(new Color(240, 240, 240));
-        timerPanel.setLayout(new GridLayout(6, 1, 5, 5));
+        timerPanel.setLayout(new GridLayout(7, 1, 5, 5));
         timerPanel.setBorder(BorderFactory.createTitledBorder("Work Session Info"));
 
         JLabel nameDisplay = new JLabel(employeeName, SwingConstants.CENTER);
         nameDisplay.setFont(new Font("SansSerif", Font.BOLD, 18));
         nameDisplay.setForeground(new Color(28, 43, 54));
+
+        dateLabel = new JLabel("Date: " + getCurrentDate(), SwingConstants.CENTER);
+        dateLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
 
         workingTimeLabel = new JLabel("Working Time: 00:00:00", SwingConstants.CENTER);
         workingTimeLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
@@ -91,18 +100,19 @@ public class EmployeeDashboardView extends JFrame {
         startBreakBtn = new JButton("Start Break");
         endBreakBtn = new JButton("End Break");
 
-        // Style buttons
         styleTimerButton(startBreakBtn);
         styleTimerButton(endBreakBtn);
 
-        timerPanel.add(Box.createVerticalStrut(10));
         timerPanel.add(nameDisplay);
+        timerPanel.add(dateLabel);
         timerPanel.add(workingTimeLabel);
         timerPanel.add(breakTimeLabel);
         timerPanel.add(startBreakBtn);
         timerPanel.add(endBreakBtn);
 
-        contentPanel.add(timerPanel);
+        dashboardCard.add(timerPanel);
+
+        contentPanel.add(dashboardCard, "Dashboard");
 
         add(contentPanel, BorderLayout.CENTER);
     }
@@ -124,5 +134,9 @@ public class EmployeeDashboardView extends JFrame {
         button.setForeground(Color.BLACK);
         button.setFont(new Font("SansSerif", Font.BOLD, 13));
         button.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
+    }
+
+    private String getCurrentDate() {
+        return LocalDate.now().format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
     }
 }

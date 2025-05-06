@@ -5,6 +5,8 @@ import views.EmployeeDashboardView;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class EmployeeDashboardController {
     private EmployeeDashboardView view;
@@ -14,29 +16,34 @@ public class EmployeeDashboardController {
     private int breakSeconds = 0;
     private boolean onBreak = false;
 
+    private String employeeName;
+
     public EmployeeDashboardController(String employeeName) {
+        this.employeeName = employeeName;
         view = new EmployeeDashboardView(employeeName);
         initController();
         view.setVisible(true);
-        startWorkingTimer();  // Start working timer when dashboard loads
+        startTimers(); // Start the real-time timers
     }
 
     private void initController() {
         view.logoutBtn.addActionListener(_ -> handleLogout());
 
-        // Navigation (placeholders)
-        view.dashboardBtn.addActionListener(_ -> System.out.println("Dashboard clicked"));
-        view.profileBtn.addActionListener(_ -> System.out.println("Profile clicked"));
-        view.leaveBtn.addActionListener(_ -> System.out.println("Leave clicked"));
-        view.salaryBtn.addActionListener(_ -> System.out.println("Salary clicked"));
-        view.settingBtn.addActionListener(_ -> System.out.println("Setting clicked"));
+        view.dashboardBtn.addActionListener(e -> {
+            view.cardLayout.show(view.contentPanel, "Dashboard");
+        });
 
-        // Timer buttons
-        view.startBreakBtn.addActionListener(_ -> startBreak());
-        view.endBreakBtn.addActionListener(_ -> endBreak());
+        // Add placeholders for future views
+        view.profileBtn.addActionListener(_ -> JOptionPane.showMessageDialog(null, "Profile View (Coming Soon)"));
+        view.leaveBtn.addActionListener(_ -> JOptionPane.showMessageDialog(null, "Leave View (Coming Soon)"));
+        view.salaryBtn.addActionListener(_ -> JOptionPane.showMessageDialog(null, "Salary View (Coming Soon)"));
+        view.settingBtn.addActionListener(_ -> JOptionPane.showMessageDialog(null, "Setting View (Coming Soon)"));
+
+        view.startBreakBtn.addActionListener(_ -> onBreak = true);
+        view.endBreakBtn.addActionListener(_ -> onBreak = false);
     }
 
-    private void startWorkingTimer() {
+    private void startTimers() {
         timer = new Timer(1000, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (onBreak) {
@@ -46,17 +53,12 @@ public class EmployeeDashboardController {
                     workingSeconds++;
                     view.workingTimeLabel.setText("Working Time: " + formatTime(workingSeconds));
                 }
+
+                // Update date every second just in case the date changes at midnight
+                view.dateLabel.setText("Date: " + getCurrentDate());
             }
         });
         timer.start();
-    }
-
-    private void startBreak() {
-        onBreak = true;
-    }
-
-    private void endBreak() {
-        onBreak = false;
     }
 
     private String formatTime(int totalSeconds) {
@@ -66,9 +68,13 @@ public class EmployeeDashboardController {
         return String.format("%02d:%02d:%02d", hrs, mins, secs);
     }
 
+    private String getCurrentDate() {
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
+    }
+
     private void handleLogout() {
-        timer.stop(); // Stop the timer
-        view.dispose();  // Close dashboard window
+        timer.stop();
+        view.dispose();
         System.out.println("Logged out!");
     }
 }
