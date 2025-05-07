@@ -1,15 +1,21 @@
 package controllers;
 
 import views.EmployeeDashboardView;
+import views.EmployeeLeaveView;
+import controllers.EmployeeLeaveController;
 import views.EmployeeProfileView;
-import models.EmployeeModel;
 import controllers.EmployeeProfileController;
-
+import models.EmployeeModel;
+import views.EmployeeSalaryView;
+import controllers.EmployeeSalaryController;
+import models.SalaryModel;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import views.SettingsView; // ✅ NEW
+import controllers.SettingsController; // ✅ NEW
 
 public class EmployeeDashboardController {
     private EmployeeDashboardView view;
@@ -18,47 +24,84 @@ public class EmployeeDashboardController {
     private int breakSeconds = 0;
     private boolean onBreak = false;
     private String employeeName;
-    private int empId; // Employee ID passed for profile data
+    private int empId;
 
-    private EmployeeProfileView profileView; // Reference to profile view
-    private EmployeeProfileController profileController; // Reference to profile controller
+    // ✅ Leave View and Controller
+    private EmployeeLeaveView leaveView;
+    private EmployeeLeaveController leaveController;
+
+    // ✅ Profile View and Controller
+    private EmployeeProfileView profileView;
+    private EmployeeProfileController profileController;
+
+    // ✅ Salary View and Controller
+    private EmployeeSalaryView salaryView;
+    private EmployeeSalaryController salaryController;
+
+    // ✅ Settings View and Controller
+    private SettingsView settingsView;
+    private SettingsController settingsController;
 
     public EmployeeDashboardController(String employeeName, int empId) {
         this.employeeName = employeeName;
         this.empId = empId;
 
-        // Initialize the main dashboard view and the profile view
         view = new EmployeeDashboardView(employeeName);
-        profileView = new EmployeeProfileView(empId); // Initialize profile view with employee ID
-        profileController = new EmployeeProfileController(profileView, empId); // Initialize profile controller
 
-        // Add the profile view panel to CardLayout
-        view.contentPanel.add(profileView, "My Profile");
+        // ✅ Initialize Leave View/Controller
+        leaveView = new EmployeeLeaveView();
+        leaveController = new EmployeeLeaveController(leaveView, new models.LeaveModel(), empId);
+        view.contentPanel.add(leaveView, "Leave");
+
+        // ✅ Initialize Profile View/Controller
+        profileView = new EmployeeProfileView();
+        profileController = new EmployeeProfileController(profileView, new EmployeeModel(), empId);
+        view.contentPanel.add(profileView, "Profile");
+
+        // ✅ Initialize Salary View/Controller
+        salaryView = new EmployeeSalaryView();
+        salaryController = new EmployeeSalaryController(salaryView, new SalaryModel(), empId);
+        view.contentPanel.add(salaryView, "Salary");
+
+        // ✅ Initialize Settings View/Controller
+        settingsView = new SettingsView();
+        settingsController = new SettingsController(settingsView, new EmployeeModel(), empId);
+        view.contentPanel.add(settingsView, "Settings");
 
         initController();
         view.setVisible(true);
-        startTimers(); // Start working timer
+        startTimers();
     }
 
     private void initController() {
         view.logoutBtn.addActionListener(_ -> handleLogout());
 
-        // Handle Dashboard button click
         view.dashboardBtn.addActionListener(e -> {
             view.cardLayout.show(view.contentPanel, "Dashboard");
         });
 
-        // Handle Profile button click
+        // ✅ Show Profile Panel when "My Profile" is clicked
         view.profileBtn.addActionListener(e -> {
-            profileController.openProfileWindow(); // Open profile in new window
+            profileController.loadEmployeeProfile(); // optional: refresh data
+            view.cardLayout.show(view.contentPanel, "Profile");
         });
 
-        // Placeholder buttons for future functionality
-        view.leaveBtn.addActionListener(_ -> JOptionPane.showMessageDialog(null, "Leave View (Coming Soon)"));
-        view.salaryBtn.addActionListener(_ -> JOptionPane.showMessageDialog(null, "Salary View (Coming Soon)"));
-        view.settingBtn.addActionListener(_ -> JOptionPane.showMessageDialog(null, "Setting View (Coming Soon)"));
+        view.leaveBtn.addActionListener(e -> {
+            leaveController.refreshLeaveTable();
+            view.cardLayout.show(view.contentPanel, "Leave");
+        });
 
-        // Break timer functionality
+        // ✅ Show Salary Panel when "Salary" is clicked
+        view.salaryBtn.addActionListener(e -> {
+            salaryController.loadSalaryData(); // optional: refresh salary data
+            view.cardLayout.show(view.contentPanel, "Salary");
+        });
+
+        // ✅ Show Settings Panel when "Setting" is clicked
+        view.settingBtn.addActionListener(e -> {
+            view.cardLayout.show(view.contentPanel, "Settings");
+        });
+
         view.startBreakBtn.addActionListener(_ -> onBreak = true);
         view.endBreakBtn.addActionListener(_ -> onBreak = false);
     }
@@ -74,7 +117,6 @@ public class EmployeeDashboardController {
                     view.workingTimeLabel.setText("Working Time: " + formatTime(workingSeconds));
                 }
 
-                // Update date every second just in case the date changes at midnight
                 view.dateLabel.setText("Date: " + getCurrentDate());
             }
         });

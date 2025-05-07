@@ -2,141 +2,55 @@ package views;
 
 import javax.swing.*;
 import java.awt.*;
-import models.EmployeeModel;
-import java.util.HashMap;
 
 public class EmployeeProfileView extends JPanel {
+    public JLabel nameLabel, emailLabel, phoneLabel, departmentLabel, designationLabel, dateJoinedLabel, salaryLabel;
     public JLabel profilePicLabel;
-    public JLabel nameValue, idValue, emailValue, phoneValue, deptValue, desigValue, joinDateValue, salaryValue;
-    public JButton uploadPicBtn;
 
-    private int empId;
-    private EmployeeModel model;
-
-    public EmployeeProfileView(int empId) {
-        this.empId = empId;
-        this.model = new EmployeeModel(); // Initialize model to fetch data
+    public EmployeeProfileView() {
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
-        setPreferredSize(new Dimension(400, 600));
 
-        // Profile Card Setup
-        JPanel profileCard = new JPanel(new GridBagLayout());
-        profileCard.setBackground(Color.WHITE);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 20, 10, 20);
-        gbc.anchor = GridBagConstraints.WEST;
+        JLabel heading = new JLabel("My Profile", SwingConstants.CENTER);
+        heading.setFont(new Font("SansSerif", Font.BOLD, 20));
+        add(heading, BorderLayout.NORTH);
 
-        // Profile Picture Section
+        JPanel infoPanel = new JPanel(new GridLayout(7, 2, 10, 10));
+        infoPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
+        infoPanel.setBackground(Color.WHITE);
+
+        nameLabel = new JLabel();
+        emailLabel = new JLabel();
+        phoneLabel = new JLabel();
+        departmentLabel = new JLabel();
+        designationLabel = new JLabel();
+        dateJoinedLabel = new JLabel();
+        salaryLabel = new JLabel();
+
+        infoPanel.add(new JLabel("Name:")); infoPanel.add(nameLabel);
+        infoPanel.add(new JLabel("Email:")); infoPanel.add(emailLabel);
+        infoPanel.add(new JLabel("Phone:")); infoPanel.add(phoneLabel);
+        infoPanel.add(new JLabel("Department:")); infoPanel.add(departmentLabel);
+        infoPanel.add(new JLabel("Designation:")); infoPanel.add(designationLabel);
+        infoPanel.add(new JLabel("Date Joined:")); infoPanel.add(dateJoinedLabel);
+        infoPanel.add(new JLabel("Salary:")); infoPanel.add(salaryLabel);
+
+        add(infoPanel, BorderLayout.CENTER);
+
+        // Profile picture
         profilePicLabel = new JLabel();
+        profilePicLabel.setHorizontalAlignment(SwingConstants.CENTER);
         profilePicLabel.setPreferredSize(new Dimension(150, 150));
-        profilePicLabel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-        profilePicLabel.setHorizontalAlignment(JLabel.CENTER);
-        profilePicLabel.setOpaque(true);
-        profilePicLabel.setBackground(Color.LIGHT_GRAY);
-
-        uploadPicBtn = new JButton("Upload Picture");
-        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
-        profileCard.add(profilePicLabel, gbc);
-        gbc.gridy++;
-        profileCard.add(uploadPicBtn, gbc);
-
-        // Profile data labels
-        nameValue = new JLabel();
-        idValue = new JLabel();
-        emailValue = new JLabel();
-        phoneValue = new JLabel();
-        deptValue = new JLabel();
-        desigValue = new JLabel();
-        joinDateValue = new JLabel();
-        salaryValue = new JLabel();
-
-        addProfileData(profileCard, gbc);
-
-        add(profileCard, BorderLayout.CENTER);
+        add(profilePicLabel, BorderLayout.EAST);
     }
 
-    private void addProfileData(JPanel panel, GridBagConstraints gbc) {
-        // Add labels and values to the profile card
-        int row = 2;
-        gbc.gridwidth = 1;
-
-        // Add label and value in two columns per row
-        gbc.gridx = 0;
-        gbc.gridy = row;
-        panel.add(new JLabel("Full Name:"), gbc);
-        gbc.gridx = 1;
-        panel.add(nameValue, gbc);
-
-        row++;
-        gbc.gridx = 0;
-        gbc.gridy = row;
-        panel.add(new JLabel("Employee ID:"), gbc);
-        gbc.gridx = 1;
-        panel.add(idValue, gbc);
-
-        row++;
-        gbc.gridx = 0;
-        gbc.gridy = row;
-        panel.add(new JLabel("Email:"), gbc);
-        gbc.gridx = 1;
-        panel.add(emailValue, gbc);
-
-        row++;
-        gbc.gridx = 0;
-        gbc.gridy = row;
-        panel.add(new JLabel("Phone:"), gbc);
-        gbc.gridx = 1;
-        panel.add(phoneValue, gbc);
-
-        row++;
-        gbc.gridx = 0;
-        gbc.gridy = row;
-        panel.add(new JLabel("Department:"), gbc);
-        gbc.gridx = 1;
-        panel.add(deptValue, gbc);
-
-        row++;
-        gbc.gridx = 0;
-        gbc.gridy = row;
-        panel.add(new JLabel("Designation:"), gbc);
-        gbc.gridx = 1;
-        panel.add(desigValue, gbc);
-
-        row++;
-        gbc.gridx = 0;
-        gbc.gridy = row;
-        panel.add(new JLabel("Date Joined:"), gbc);
-        gbc.gridx = 1;
-        panel.add(joinDateValue, gbc);
-
-        row++;
-        gbc.gridx = 0;
-        gbc.gridy = row;
-        panel.add(new JLabel("Salary:"), gbc);
-        gbc.gridx = 1;
-        panel.add(salaryValue, gbc);
-    }
-
-    public void refreshData() {
-        // Fetch data from the model using empId
-        HashMap<String, Object> data = model.getEmployeeDataById(empId);
-
-        if (!data.isEmpty()) {
-            nameValue.setText(data.get("first_name") + " " + data.get("last_name"));
-            idValue.setText(String.valueOf(data.get("emp_id")));
-            emailValue.setText((String) data.get("email"));
-            phoneValue.setText((String) data.get("phone"));
-            deptValue.setText((String) data.get("department"));
-            desigValue.setText((String) data.get("designation"));
-            joinDateValue.setText(data.get("date_joined").toString());
-            salaryValue.setText(data.get("salary").toString());
-
-            byte[] imgBytes = (byte[]) data.get("profile_pic");
-            if (imgBytes != null) {
-                ImageIcon icon = new ImageIcon(new ImageIcon(imgBytes).getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH));
-                profilePicLabel.setIcon(icon);
-            }
+    public void setProfilePic(byte[] imageData) {
+        if (imageData != null) {
+            ImageIcon icon = new ImageIcon(imageData);
+            Image scaled = icon.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
+            profilePicLabel.setIcon(new ImageIcon(scaled));
+        } else {
+            profilePicLabel.setIcon(null);
         }
     }
 }

@@ -2,79 +2,56 @@ package models;
 
 import java.sql.*;
 import java.util.HashMap;
+import java.util.Map;
 
 public class EmployeeModel {
+    public boolean changePassword(int empId, String currentPassword, String newPassword) {
+        boolean isUpdated = false;
+        try (Connection conn = DBConnection.getConnection()) {
+            // First, verify the current password
+            String checkPasswordSql = "SELECT password FROM employee WHERE emp_id = ?";
+            PreparedStatement checkStmt = conn.prepareStatement(checkPasswordSql);
+            checkStmt.setInt(1, empId);
+            ResultSet rs = checkStmt.executeQuery();
 
-    // Existing method: Get employee data by email
-    public HashMap<String, Object> getEmployeeDataByEmail(String email) {
-        HashMap<String, Object> data = new HashMap<>();
-
-        try (Connection con = DBConnection.getConnection()) {
-            String query = "SELECT * FROM employee WHERE email = ?";
-            PreparedStatement stmt = con.prepareStatement(query);
-            stmt.setString(1, email);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                data.put("emp_id", rs.getInt("emp_id"));
-                data.put("first_name", rs.getString("first_name"));
-                data.put("last_name", rs.getString("last_name"));
-                data.put("email", rs.getString("email"));
-                data.put("phone", rs.getString("phone"));
-                data.put("department", rs.getString("department"));
-                data.put("designation", rs.getString("designation"));
-                data.put("date_joined", rs.getDate("date_joined"));
-                data.put("salary", rs.getBigDecimal("salary"));
-                data.put("profile_pic", rs.getBytes("profile_pic"));
+            if (rs.next() && rs.getString("password").equals(currentPassword)) {
+                // If current password matches, update the password
+                String updatePasswordSql = "UPDATE employee SET password = ? WHERE emp_id = ?";
+                PreparedStatement updateStmt = conn.prepareStatement(updatePasswordSql);
+                updateStmt.setString(1, newPassword); // You may want to hash the password here
+                updateStmt.setInt(2, empId);
+                int rowsAffected = updateStmt.executeUpdate();
+                if (rowsAffected > 0) {
+                    isUpdated = true;
+                }
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        return data;
+        return isUpdated;
     }
 
-    // New method: Get employee data by employee ID
-    public HashMap<String, Object> getEmployeeDataById(int empId) {
-        HashMap<String, Object> data = new HashMap<>();
-
-        try (Connection con = DBConnection.getConnection()) {
-            String query = "SELECT * FROM employee WHERE emp_id = ?";
-            PreparedStatement stmt = con.prepareStatement(query);
-            stmt.setInt(1, empId);  // Use the empId parameter to fetch data
+    public Map<String, Object> getEmployeeProfile(int empId) {
+        Map<String, Object> profileData = new HashMap<>();
+        try (Connection conn = DBConnection.getConnection()) {
+            String sql = "SELECT first_name, last_name, email, phone, department, designation, date_joined, salary, profile_pic FROM employee WHERE emp_id = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, empId);
             ResultSet rs = stmt.executeQuery();
-
             if (rs.next()) {
-                data.put("emp_id", rs.getInt("emp_id"));
-                data.put("first_name", rs.getString("first_name"));
-                data.put("last_name", rs.getString("last_name"));
-                data.put("email", rs.getString("email"));
-                data.put("phone", rs.getString("phone"));
-                data.put("department", rs.getString("department"));
-                data.put("designation", rs.getString("designation"));
-                data.put("date_joined", rs.getDate("date_joined"));
-                data.put("salary", rs.getBigDecimal("salary"));
-                data.put("profile_pic", rs.getBytes("profile_pic"));
+                profileData.put("first_name", rs.getString("first_name"));
+                profileData.put("last_name", rs.getString("last_name"));
+                profileData.put("email", rs.getString("email"));
+                profileData.put("phone", rs.getString("phone"));
+                profileData.put("department", rs.getString("department"));
+                profileData.put("designation", rs.getString("designation"));
+                profileData.put("date_joined", rs.getDate("date_joined"));
+                profileData.put("salary", rs.getBigDecimal("salary"));
+                profileData.put("profile_pic", rs.getBytes("profile_pic")); // may be null
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        return data;
-    }
-
-    // Existing method: Save the profile picture
-    public void saveProfilePicture(int empId, byte[] imageBytes) {
-        try (Connection con = DBConnection.getConnection()) {
-            String sql = "UPDATE employee SET profile_pic = ? WHERE emp_id = ?";
-            PreparedStatement ps = con.prepareStatement(sql);
-            ps.setBytes(1, imageBytes);
-            ps.setInt(2, empId);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        return profileData;
     }
 }
