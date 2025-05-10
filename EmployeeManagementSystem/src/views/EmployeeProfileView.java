@@ -1,6 +1,7 @@
 package views;
 
 import javax.swing.*;
+import javax.swing.border.*;
 import java.awt.*;
 
 public class EmployeeProfileView extends JPanel {
@@ -8,16 +9,46 @@ public class EmployeeProfileView extends JPanel {
     public JLabel profilePicLabel;
 
     public EmployeeProfileView() {
-        setLayout(new BorderLayout());
+        setLayout(new BorderLayout(15, 15));
         setBackground(Color.WHITE);
+        setBorder(new EmptyBorder(30, 50, 30, 50)); // Better padding
 
+        // === Heading ===
         JLabel heading = new JLabel("My Profile", SwingConstants.CENTER);
-        heading.setFont(new Font("SansSerif", Font.BOLD, 20));
+        heading.setFont(new Font("Segoe UI", Font.BOLD, 26));
+        heading.setForeground(new Color(0, 150, 136));
+        heading.setBorder(new EmptyBorder(10, 0, 20, 0));
         add(heading, BorderLayout.NORTH);
 
-        JPanel infoPanel = new JPanel(new GridLayout(7, 2, 10, 10));
-        infoPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
-        infoPanel.setBackground(Color.WHITE);
+        // === Profile Panel (Card style) ===
+        JPanel profilePanel = new JPanel(new BorderLayout(30, 0));
+        profilePanel.setBackground(new Color(250, 250, 250));
+        profilePanel.setBorder(new CompoundBorder(
+                new LineBorder(new Color(0, 150, 136), 1, true),
+                new EmptyBorder(25, 30, 25, 30)
+        ));
+
+        // === Profile Picture Panel ===
+        profilePicLabel = new JLabel();
+        profilePicLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        profilePicLabel.setPreferredSize(new Dimension(150, 150));
+        profilePicLabel.setBorder(new LineBorder(Color.LIGHT_GRAY, 2, true));
+
+        JPanel picPanel = new JPanel(new BorderLayout());
+        picPanel.setBackground(new Color(250, 250, 250));
+        picPanel.setBorder(new EmptyBorder(0, 0, 0, 20));
+        picPanel.add(profilePicLabel, BorderLayout.NORTH);
+
+        // === Info Panel ===
+        JPanel infoPanel = new JPanel(new GridBagLayout());
+        infoPanel.setBackground(new Color(250, 250, 250));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(12, 10, 12, 10);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        Font labelFont = new Font("Segoe UI", Font.BOLD, 16);
+        Font valueFont = new Font("Segoe UI", Font.PLAIN, 16);
 
         nameLabel = new JLabel();
         emailLabel = new JLabel();
@@ -27,27 +58,37 @@ public class EmployeeProfileView extends JPanel {
         dateJoinedLabel = new JLabel();
         salaryLabel = new JLabel();
 
-        infoPanel.add(new JLabel("Name:")); infoPanel.add(nameLabel);
-        infoPanel.add(new JLabel("Email:")); infoPanel.add(emailLabel);
-        infoPanel.add(new JLabel("Phone:")); infoPanel.add(phoneLabel);
-        infoPanel.add(new JLabel("Department:")); infoPanel.add(departmentLabel);
-        infoPanel.add(new JLabel("Designation:")); infoPanel.add(designationLabel);
-        infoPanel.add(new JLabel("Date Joined:")); infoPanel.add(dateJoinedLabel);
-        infoPanel.add(new JLabel("Salary:")); infoPanel.add(salaryLabel);
+        JLabel[] labels = {
+            new JLabel("Name:"), new JLabel("Email:"), new JLabel("Phone:"),
+            new JLabel("Department:"), new JLabel("Designation:"),
+            new JLabel("Date Joined:"), new JLabel("Salary:")
+        };
 
-        add(infoPanel, BorderLayout.CENTER);
+        JLabel[] values = {
+            nameLabel, emailLabel, phoneLabel,
+            departmentLabel, designationLabel,
+            dateJoinedLabel, salaryLabel
+        };
 
-        // Profile picture
-        profilePicLabel = new JLabel();
-        profilePicLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        profilePicLabel.setPreferredSize(new Dimension(150, 150));
-        add(profilePicLabel, BorderLayout.EAST);
+        for (int i = 0; i < labels.length; i++) {
+            labels[i].setFont(labelFont);
+            values[i].setFont(valueFont);
+            gbc.gridx = 0; gbc.gridy = i;
+            infoPanel.add(labels[i], gbc);
+            gbc.gridx = 1;
+            gbc.weightx = 1;
+            infoPanel.add(values[i], gbc);
+        }
+
+        profilePanel.add(picPanel, BorderLayout.WEST);
+        profilePanel.add(infoPanel, BorderLayout.CENTER);
+        add(profilePanel, BorderLayout.CENTER);
     }
 
     public void setProfilePic(byte[] imageData) {
         if (imageData != null) {
             ImageIcon icon = new ImageIcon(imageData);
-            Image scaled = icon.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
+            Image scaled = icon.getImage().getScaledInstance(140, 140, Image.SCALE_SMOOTH);
             profilePicLabel.setIcon(new ImageIcon(scaled));
         } else {
             profilePicLabel.setIcon(null);

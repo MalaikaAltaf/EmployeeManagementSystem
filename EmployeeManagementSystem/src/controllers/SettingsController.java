@@ -3,8 +3,6 @@ package controllers;
 import models.EmployeeModel;
 import views.SettingsView;
 
-import java.awt.Color;
-
 import javax.swing.*;
 
 public class SettingsController {
@@ -27,22 +25,40 @@ public class SettingsController {
         String confirmPassword = new String(settingsView.confirmPasswordField.getPassword());
 
         if (currentPassword.isEmpty() || newPassword.isEmpty() || confirmPassword.isEmpty()) {
-            settingsView.messageLabel.setText("All fields are required.");
+            JOptionPane.showMessageDialog(settingsView,
+                    "All fields are required.",
+                    "Input Error",
+                    JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         if (!newPassword.equals(confirmPassword)) {
-            settingsView.messageLabel.setText("New passwords do not match.");
+            JOptionPane.showMessageDialog(settingsView,
+                    "New passwords do not match.",
+                    "Mismatch Error",
+                    JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         // Try to change password
         boolean isUpdated = employeeModel.changePassword(empId, currentPassword, newPassword);
         if (isUpdated) {
-            settingsView.messageLabel.setText("Password changed successfully!");
-            settingsView.messageLabel.setForeground(Color.GREEN);
+            JOptionPane.showMessageDialog(settingsView,
+                    "Password changed successfully!",
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE);
+            clearFields();
         } else {
-            settingsView.messageLabel.setText("Current password is incorrect.");
+            JOptionPane.showMessageDialog(settingsView,
+                    "Current password is incorrect.",
+                    "Authentication Failed",
+                    JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private void clearFields() {
+        settingsView.currentPasswordField.setText("");
+        settingsView.newPasswordField.setText("");
+        settingsView.confirmPasswordField.setText("");
     }
 }

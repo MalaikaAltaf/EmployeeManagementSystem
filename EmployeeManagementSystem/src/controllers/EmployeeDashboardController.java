@@ -134,9 +134,20 @@ public class EmployeeDashboardController {
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
     }
 
-    private void handleLogout() {
+private void handleLogout() {
+    int option = JOptionPane.showConfirmDialog(
+        view,
+        "Are you sure you want to log out?",
+        "Confirm Logout",
+        JOptionPane.YES_NO_OPTION,
+        JOptionPane.QUESTION_MESSAGE
+    );
+
+    if (option == JOptionPane.YES_OPTION) {
         timer.stop();
         view.dispose();
         System.out.println("Logged out!");
     }
+}
+
 }

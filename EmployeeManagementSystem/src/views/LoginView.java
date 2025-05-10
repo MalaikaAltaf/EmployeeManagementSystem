@@ -14,6 +14,28 @@ public class LoginView extends JFrame {
     private JButton exitBtn;
     private JCheckBox rememberMe;
 
+    // Custom JPanel to draw the image scaled to fill the panel
+    class ImagePanel extends JPanel {
+        private Image image;
+
+        public ImagePanel(String imagePath) {
+            try {
+                ImageIcon icon = new ImageIcon(imagePath);
+                this.image = icon.getImage();
+            } catch (Exception e) {
+                System.out.println("Error loading image: " + e.getMessage());
+            }
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            if (image != null) {
+                g.drawImage(image, 0, 0, getWidth(), getHeight(), this);
+            }
+        }
+    }
+
     public LoginView() {
         setTitle("EMS Login");
         setSize(900, 500);
@@ -21,15 +43,9 @@ public class LoginView extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Left panel
-        JPanel leftPanel = new JPanel();
-        leftPanel.setBackground(new Color(58, 75, 87));
-        leftPanel.setLayout(new GridBagLayout());
+        // Left panel with background image
+        ImagePanel leftPanel = new ImagePanel("C:/Users/hp/Desktop/EMS/EmployeeManagementSystem/lib/6tarslogo.PNG");
         leftPanel.setPreferredSize(new Dimension(400, 0));
-
-        JLabel title = new JLabel("<html><div style='text-align: center;'><h1 style='color:white;'>Employee<br>Management System</h1>"
-                + "<p style='font-size:14px; color:white;'>Streamline HR operations with our<br>comprehensive employee management<br>solution.</p></div></html>");
-        leftPanel.add(title);
 
         // Right panel
         JPanel rightPanel = new JPanel();
