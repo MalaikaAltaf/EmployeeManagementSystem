@@ -2,7 +2,9 @@ package controllers;
 
 
 import java.awt.Component;
-import  java.awt.GridLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
 
 
 
@@ -24,7 +26,6 @@ import views.SettingsView; // ✅ NEW
 import controllers.SettingsController; // ✅ NEW
 
 import models.EmployeeTaskModel;
-import models.EmployeeTaskModel.Task;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Date;
@@ -71,7 +72,7 @@ public class EmployeeDashboardController {
 
         // Initialize task model with DB connection
         try {
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/your_database_name", "username", "password");
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/EMS1", "root", "root1122");
             taskModel = new EmployeeTaskModel(conn);
         } catch (Exception e) {
             e.printStackTrace();
@@ -200,8 +201,16 @@ private void handleLogout() {
     }
 }
 private void showAddTaskDialog() {
+    JDialog dialog = new JDialog(view, "Add New Task", true);
+    dialog.setSize(400, 400);
+    dialog.setLocationRelativeTo(view);
+
+    JPanel mainPanel = new JPanel();
+    mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+    mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
     JTextField titleField = new JTextField(20);
-    JTextArea descriptionArea = new JTextArea(5, 20);
+    JTextArea descriptionArea = new JTextArea(3, 20);
     descriptionArea.setLineWrap(true);
     descriptionArea.setWrapStyleWord(true);
 
@@ -210,24 +219,42 @@ private void showAddTaskDialog() {
     JTextField endDateField = new JTextField(LocalDate.now().plusDays(7).toString());
     JTextField performanceRatingField = new JTextField("5");
 
-    JPanel panel = new JPanel(new GridLayout(0, 1));
-    panel.add(new JLabel("Task Title:"));
-    panel.add(titleField);
-    panel.add(new JLabel("Task Description:"));
-    panel.add(new JScrollPane(descriptionArea));
-    panel.add(new JLabel("Status:"));
-    panel.add(statusComboBox);
-    panel.add(new JLabel("Start Date (YYYY-MM-DD):"));
-    panel.add(startDateField);
-    panel.add(new JLabel("End Date (YYYY-MM-DD):"));
-    panel.add(endDateField);
-    panel.add(new JLabel("Performance Rating (1-10):"));
-    panel.add(performanceRatingField);
+    mainPanel.add(new JLabel("Task Title:"));
+    mainPanel.add(titleField);
+    mainPanel.add(Box.createVerticalStrut(10));
 
-    int result = JOptionPane.showConfirmDialog(view, panel, "Add New Task",
-            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+    mainPanel.add(new JLabel("Task Description:"));
+    JScrollPane descriptionScroll = new JScrollPane(descriptionArea);
+    descriptionScroll.setPreferredSize(new Dimension(350, 60));
+    mainPanel.add(descriptionScroll);
+    mainPanel.add(Box.createVerticalStrut(10));
 
-    if (result == JOptionPane.OK_OPTION) {
+    JPanel statusDatePanel = new JPanel(new GridLayout(2, 2, 10, 10));
+    statusDatePanel.add(new JLabel("Status:"));
+    statusDatePanel.add(statusComboBox);
+    statusDatePanel.add(new JLabel("Start Date (YYYY-MM-DD):"));
+    statusDatePanel.add(startDateField);
+    statusDatePanel.add(new JLabel("End Date (YYYY-MM-DD):"));
+    statusDatePanel.add(endDateField);
+    mainPanel.add(statusDatePanel);
+    mainPanel.add(Box.createVerticalStrut(10));
+
+    mainPanel.add(new JLabel("Performance Rating (1-10):"));
+    mainPanel.add(performanceRatingField);
+    mainPanel.add(Box.createVerticalStrut(20));
+
+    JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+    JButton submitButton = new JButton("Submit");
+    JButton cancelButton = new JButton("Cancel");
+    buttonPanel.add(submitButton);
+    buttonPanel.add(cancelButton);
+
+    mainPanel.add(buttonPanel);
+
+    dialog.add(mainPanel);
+    dialog.getRootPane().setDefaultButton(submitButton);
+
+    submitButton.addActionListener(e -> {
         try {
             String title = titleField.getText().trim();
             String description = descriptionArea.getText().trim();
@@ -241,17 +268,21 @@ private void showAddTaskDialog() {
                 JOptionPane.showMessageDialog(view, "Task added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 updatePerformanceStats();
                 refreshTaskList();
+                dialog.dispose();
             } else {
                 JOptionPane.showMessageDialog(view, "Failed to add task.", "Error", JOptionPane.ERROR_MESSAGE);
             }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(view, "Invalid input: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(view, "Invalid input: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
-    }
-    
+    });
+
+    cancelButton.addActionListener(e -> dialog.dispose());
+
+    dialog.setVisible(true);
 }
 private void updatePerformanceStats() {
-    List<Task> tasks = taskModel.getTasksByEmployee(empId);
+    List<EmployeeTaskModel.Task> tasks = taskModel.getTasksByEmployee(empId);
     if (tasks.isEmpty()) {
         view.taskProgressBar.setValue(0);
         view.goalsCompletionLabel.setText("Goals Completion: 0%");
@@ -259,7 +290,7 @@ private void updatePerformanceStats() {
     }
     int totalRating = 0;
     int completedTasks = 0;
-    for (Task task : tasks) {
+    for (EmployeeTaskModel.Task task : tasks) {
         totalRating += task.performanceRating;
         if ("Completed".equalsIgnoreCase(task.status)) {
             completedTasks++;
@@ -273,15 +304,101 @@ private void updatePerformanceStats() {
 }
 
 private void refreshTaskList() {
-    List<Task> tasks = taskModel.getTasksByEmployee(empId);
-    view.taskPanel.removeAll();
-    for (Task task : tasks) {
+    List<EmployeeTaskModel.Task> tasks = taskModel.getTasksByEmployee(empId);
+    view.taskListPanel.removeAll();
+    for (EmployeeTaskModel.Task task : tasks) {
         views.TaskPanel taskPanel = new views.TaskPanel(task.title, task.description, task.status, task.performanceRating);
-        view.taskPanel.add(taskPanel);
-        view.taskPanel.add(Box.createVerticalStrut(10));
+        // Set edit listener for each task panel
+        taskPanel.setEditListener(() -> showEditTaskDialog(task));
+        view.taskListPanel.add(taskPanel);
+        view.taskListPanel.add(Box.createVerticalStrut(10));
     }
-    view.taskPanel.revalidate();
-    view.taskPanel.repaint();
+    view.taskListPanel.revalidate();
+    view.taskListPanel.repaint();
+}
+
+private void showEditTaskDialog(EmployeeTaskModel.Task task) {
+    JDialog dialog = new JDialog(view, "Edit Task", true);
+    dialog.setSize(400, 400);
+    dialog.setLocationRelativeTo(view);
+
+    JPanel mainPanel = new JPanel();
+    mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+    mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+    JTextField titleField = new JTextField(task.title, 20);
+    JTextArea descriptionArea = new JTextArea(task.description, 3, 20);
+    descriptionArea.setLineWrap(true);
+    descriptionArea.setWrapStyleWord(true);
+
+    JComboBox<String> statusComboBox = new JComboBox<>(new String[]{"Pending", "In Progress", "Completed"});
+    statusComboBox.setSelectedItem(task.status);
+
+    JTextField startDateField = new JTextField(task.startDate.toString());
+    JTextField endDateField = new JTextField(task.endDate.toString());
+    JTextField performanceRatingField = new JTextField(String.valueOf(task.performanceRating));
+
+    mainPanel.add(new JLabel("Task Title:"));
+    mainPanel.add(titleField);
+    mainPanel.add(Box.createVerticalStrut(10));
+
+    mainPanel.add(new JLabel("Task Description:"));
+    JScrollPane descriptionScroll = new JScrollPane(descriptionArea);
+    descriptionScroll.setPreferredSize(new Dimension(350, 60));
+    mainPanel.add(descriptionScroll);
+    mainPanel.add(Box.createVerticalStrut(10));
+
+    JPanel statusDatePanel = new JPanel(new GridLayout(2, 2, 10, 10));
+    statusDatePanel.add(new JLabel("Status:"));
+    statusDatePanel.add(statusComboBox);
+    statusDatePanel.add(new JLabel("Start Date (YYYY-MM-DD):"));
+    statusDatePanel.add(startDateField);
+    statusDatePanel.add(new JLabel("End Date (YYYY-MM-DD):"));
+    statusDatePanel.add(endDateField);
+    mainPanel.add(statusDatePanel);
+    mainPanel.add(Box.createVerticalStrut(10));
+
+    mainPanel.add(new JLabel("Performance Rating (1-10):"));
+    mainPanel.add(performanceRatingField);
+    mainPanel.add(Box.createVerticalStrut(20));
+
+    JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+    JButton submitButton = new JButton("Update");
+    JButton cancelButton = new JButton("Cancel");
+    buttonPanel.add(submitButton);
+    buttonPanel.add(cancelButton);
+
+    mainPanel.add(buttonPanel);
+
+    dialog.add(mainPanel);
+    dialog.getRootPane().setDefaultButton(submitButton);
+
+    submitButton.addActionListener(e -> {
+        try {
+            String title = titleField.getText().trim();
+            String description = descriptionArea.getText().trim();
+            String status = (String) statusComboBox.getSelectedItem();
+            Date startDate = Date.valueOf(startDateField.getText().trim());
+            Date endDate = Date.valueOf(endDateField.getText().trim());
+            int performanceRating = Integer.parseInt(performanceRatingField.getText().trim());
+
+            boolean success = taskModel.updateTask(task.taskId, title, description, status, startDate, endDate, performanceRating);
+            if (success) {
+                JOptionPane.showMessageDialog(view, "Task updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                updatePerformanceStats();
+                refreshTaskList();
+                dialog.dispose();
+            } else {
+                JOptionPane.showMessageDialog(view, "Failed to update task.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(view, "Invalid input: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    });
+
+    cancelButton.addActionListener(e -> dialog.dispose());
+
+    dialog.setVisible(true);
 }
 
 

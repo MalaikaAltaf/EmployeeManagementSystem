@@ -8,6 +8,13 @@ public class TaskPanel extends JPanel {
     private JLabel statusLabel;
     private JLabel ratingLabel;
     private JTextArea descriptionArea;
+    private JButton editButton;
+
+    public interface EditListener {
+        void onEdit();
+    }
+
+    private EditListener editListener;
 
     public TaskPanel(String title, String description, String status, int rating) {
         setLayout(new BorderLayout(8, 4));
@@ -40,6 +47,18 @@ public class TaskPanel extends JPanel {
         descriptionArea.setRows(2); // Limit to 2 lines
         descriptionArea.setPreferredSize(new Dimension(100, 40));
 
+        editButton = new JButton("Edit");
+        editButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        editButton.setFocusPainted(false);
+        editButton.setBackground(new Color(70, 130, 180));
+        editButton.setForeground(Color.WHITE);
+        editButton.setPreferredSize(new Dimension(60, 30));
+        editButton.addActionListener(e -> {
+            if (editListener != null) {
+                editListener.onEdit();
+            }
+        });
+
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setOpaque(false);
         topPanel.add(titleLabel, BorderLayout.WEST);
@@ -48,6 +67,7 @@ public class TaskPanel extends JPanel {
         statusRatingPanel.setOpaque(false);
         statusRatingPanel.add(statusLabel);
         statusRatingPanel.add(ratingLabel);
+        statusRatingPanel.add(editButton);
 
         topPanel.add(statusRatingPanel, BorderLayout.EAST);
 
@@ -66,6 +86,10 @@ public class TaskPanel extends JPanel {
                 setBackground(new Color(52, 60, 72));
             }
         });
+    }
+
+    public void setEditListener(EditListener listener) {
+        this.editListener = listener;
     }
 
     private Color getStatusColor(String status) {

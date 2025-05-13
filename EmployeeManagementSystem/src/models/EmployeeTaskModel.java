@@ -29,6 +29,24 @@ public class EmployeeTaskModel {
         }
     }
 
+    public boolean updateTask(int taskId, String title, String description, String status, Date startDate, Date endDate, int performanceRating) {
+        String sql = "UPDATE employee_tasks SET title = ?, description = ?, status = ?, start_date = ?, end_date = ?, performance_rating = ? WHERE task_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, title);
+            stmt.setString(2, description);
+            stmt.setString(3, status);
+            stmt.setDate(4, startDate);
+            stmt.setDate(5, endDate);
+            stmt.setInt(6, performanceRating);
+            stmt.setInt(7, taskId);
+            int rows = stmt.executeUpdate();
+            return rows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public List<Task> getTasksByEmployee(int empId) {
         List<Task> tasks = new ArrayList<>();
         String sql = "SELECT * FROM employee_tasks WHERE emp_id = ?";
@@ -55,6 +73,7 @@ public class EmployeeTaskModel {
         return tasks;
     }
 
+    // Inner class for Task
     public static class Task {
         public int taskId;
         public int empId;
@@ -66,7 +85,8 @@ public class EmployeeTaskModel {
         public int performanceRating;
         public Timestamp createdAt;
 
-        public Task(int taskId, int empId, String title, String description, String status, Date startDate, Date endDate, int performanceRating, Timestamp createdAt) {
+        public Task(int taskId, int empId, String title, String description, String status,
+                    Date startDate, Date endDate, int performanceRating, Timestamp createdAt) {
             this.taskId = taskId;
             this.empId = empId;
             this.title = title;
@@ -78,6 +98,4 @@ public class EmployeeTaskModel {
             this.createdAt = createdAt;
         }
     }
-
-    
 }

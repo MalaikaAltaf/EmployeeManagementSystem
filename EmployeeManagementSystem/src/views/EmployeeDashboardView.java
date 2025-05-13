@@ -19,6 +19,7 @@ public class EmployeeDashboardView extends JFrame {
     public JLabel taskCompletionLabel, goalsCompletionLabel;
 
     public JPanel taskPanel;
+    public JPanel taskListPanel;
     public JLabel taskDetailsLabel;
 
     public JButton chatButton;
@@ -203,7 +204,7 @@ public class EmployeeDashboardView extends JFrame {
         taskPanel.setBackground(Color.WHITE);
         taskPanel.setBorder(BorderFactory.createTitledBorder("Tasks"));
 
-        JPanel taskListPanel = new JPanel();
+        taskListPanel = new JPanel();
         taskListPanel.setLayout(new BoxLayout(taskListPanel, BoxLayout.Y_AXIS));
         taskListPanel.setBackground(new Color(245, 245, 245));
 
