@@ -1,3 +1,4 @@
+// Keep your package declaration
 package views;
 
 import javax.swing.*;
@@ -10,42 +11,58 @@ public class EmployeeDashboardView extends JFrame {
     public JLabel welcomeLabel, nameLabel;
     public JButton dashboardBtn, profileBtn, leaveBtn, salaryBtn, settingBtn, logoutBtn;
 
-    // Timer UI elements
     public JLabel workingTimeLabel, breakTimeLabel, dateLabel;
     public JButton startBreakBtn, endBreakBtn;
 
+    public JPanel performanceStatsPanel;
+    public JProgressBar taskProgressBar;
+    public JLabel taskCompletionLabel, goalsCompletionLabel;
+
+    public JPanel taskPanel;
+    public JLabel taskDetailsLabel;
+
+    public JButton chatButton;
+
     public CardLayout cardLayout;
     public JPanel dashboardCard;
+    public JPanel chatPanel;
 
     public EmployeeDashboardView(String employeeName) {
-        // Frame setup
         setTitle("Employee Dashboard");
-        setSize(900, 600);
+        setSize(1000, 640);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null); // Center window
         setLayout(new BorderLayout());
 
-        // Sidebar
+        initSidebar();
+        initTopBar(employeeName);
+        initContentPanel(employeeName);
+    }
+
+    private void initSidebar() {
         sidebarPanel = new JPanel();
-        sidebarPanel.setBackground(new Color(28, 43, 54));
+        sidebarPanel.setBackground(new Color(33, 40, 48));
         sidebarPanel.setPreferredSize(new Dimension(180, getHeight()));
         sidebarPanel.setLayout(new BoxLayout(sidebarPanel, BoxLayout.Y_AXIS));
-        sidebarPanel.setBorder(BorderFactory.createEmptyBorder(15, 10, 10, 10));
+        sidebarPanel.setBorder(BorderFactory.createEmptyBorder(20, 10, 10, 10));
 
         dashboardBtn = createSidebarButton("Dashboard", new Color(33, 150, 243));
         profileBtn = createSidebarButton("My Profile", new Color(76, 175, 80));
         salaryBtn = createSidebarButton("Salary", new Color(251, 192, 45));
         leaveBtn = createSidebarButton("Leave", new Color(230, 74, 25));
         settingBtn = createSidebarButton("Setting", new Color(171, 71, 188));
+        chatButton = createSidebarButton("Chat", new Color(3, 169, 244)); // Chat Button added
 
-        JButton[] navButtons = {dashboardBtn, profileBtn, salaryBtn, leaveBtn, settingBtn};
+        JButton[] navButtons = {dashboardBtn, profileBtn, salaryBtn, leaveBtn, settingBtn, chatButton};
         for (JButton btn : navButtons) {
             sidebarPanel.add(btn);
-            sidebarPanel.add(Box.createVerticalStrut(10));
+            sidebarPanel.add(Box.createVerticalStrut(15));
         }
 
         add(sidebarPanel, BorderLayout.WEST);
+    }
 
-        // Top bar
+    private void initTopBar(String employeeName) {
         topBarPanel = new JPanel(new BorderLayout());
         topBarPanel.setBackground(new Color(0, 150, 136));
         topBarPanel.setPreferredSize(new Dimension(getWidth(), 50));
@@ -59,81 +76,172 @@ public class EmployeeDashboardView extends JFrame {
         logoutBtn.setBackground(new Color(211, 47, 47));
         logoutBtn.setForeground(Color.WHITE);
         logoutBtn.setFont(new Font("SansSerif", Font.BOLD, 12));
-        logoutBtn.setPreferredSize(new Dimension(100, 35));
+        logoutBtn.setPreferredSize(new Dimension(100, 30));
 
-        JPanel logoutPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 7));
+        JPanel logoutPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 10));
         logoutPanel.setOpaque(false);
         logoutPanel.add(logoutBtn);
 
         topBarPanel.add(welcomeLabel, BorderLayout.WEST);
         topBarPanel.add(logoutPanel, BorderLayout.EAST);
-        add(topBarPanel, BorderLayout.NORTH);
 
-        // Content Panel with CardLayout
+        add(topBarPanel, BorderLayout.NORTH);
+    }
+
+    private void initContentPanel(String employeeName) {
         cardLayout = new CardLayout();
         contentPanel = new JPanel(cardLayout);
         contentPanel.setBackground(Color.WHITE);
 
-        // Dashboard Card
         dashboardCard = new JPanel(new GridBagLayout());
-        dashboardCard.setBackground(Color.WHITE);
+        dashboardCard.setBackground(new Color(245, 245, 245));
 
-        JPanel timerPanel = new JPanel();
-        timerPanel.setPreferredSize(new Dimension(350, 240));
-        timerPanel.setBackground(new Color(240, 240, 240));
-        timerPanel.setLayout(new GridLayout(7, 1, 5, 5));
-        timerPanel.setBorder(BorderFactory.createTitledBorder("Work Session Info"));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(20, 20, 20, 20);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+
+        JPanel timerPanel = createTimerPanel(employeeName);
+        dashboardCard.add(timerPanel, gbc);
+
+        gbc.gridx++;
+        JPanel statsPanel = createPerformanceStatsPanel();
+        dashboardCard.add(statsPanel, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridwidth = 2;
+        JPanel taskPanel = createTaskPanel();
+        dashboardCard.add(taskPanel, gbc);
+
+        // Add dashboard card
+        contentPanel.add(dashboardCard, "Dashboard");
+
+        // Placeholder chat panel
+        chatPanel = new JPanel();
+        chatPanel.setBackground(Color.WHITE);
+        chatPanel.setLayout(new BorderLayout());
+        chatPanel.add(new JLabel("Chat with Admin (coming soon)", SwingConstants.CENTER), BorderLayout.CENTER);
+
+        // Add chat card
+        contentPanel.add(chatPanel, "Chat");
+
+        add(contentPanel, BorderLayout.CENTER);
+    }
+
+    private JPanel createTimerPanel(String employeeName) {
+        JPanel panel = new JPanel(new GridLayout(7, 1, 5, 5));
+        panel.setPreferredSize(new Dimension(300, 230));
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createTitledBorder("Work Session Info"));
 
         JLabel nameDisplay = new JLabel(employeeName, SwingConstants.CENTER);
         nameDisplay.setFont(new Font("SansSerif", Font.BOLD, 18));
-        nameDisplay.setForeground(new Color(28, 43, 54));
+        nameDisplay.setForeground(new Color(33, 40, 48));
 
         dateLabel = new JLabel("Date: " + getCurrentDate(), SwingConstants.CENTER);
-        dateLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
-
         workingTimeLabel = new JLabel("Working Time: 00:00:00", SwingConstants.CENTER);
-        workingTimeLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
-
         breakTimeLabel = new JLabel("Break Time: 00:00:00", SwingConstants.CENTER);
+
+        dateLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        workingTimeLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
         breakTimeLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
 
-        startBreakBtn = new JButton("Start Break");
-        endBreakBtn = new JButton("End Break");
+        startBreakBtn = createActionButton("Start Break");
+        endBreakBtn = createActionButton("End Break");
 
-        styleTimerButton(startBreakBtn);
-        styleTimerButton(endBreakBtn);
+        panel.add(nameDisplay);
+        panel.add(dateLabel);
+        panel.add(workingTimeLabel);
+        panel.add(breakTimeLabel);
+        panel.add(startBreakBtn);
+        panel.add(endBreakBtn);
 
-        timerPanel.add(nameDisplay);
-        timerPanel.add(dateLabel);
-        timerPanel.add(workingTimeLabel);
-        timerPanel.add(breakTimeLabel);
-        timerPanel.add(startBreakBtn);
-        timerPanel.add(endBreakBtn);
+        return panel;
+    }
 
-        dashboardCard.add(timerPanel);
+    private JPanel createPerformanceStatsPanel() {
+        performanceStatsPanel = new JPanel();
+        performanceStatsPanel.setLayout(new BoxLayout(performanceStatsPanel, BoxLayout.Y_AXIS));
+        performanceStatsPanel.setPreferredSize(new Dimension(300, 230));
+        performanceStatsPanel.setBackground(Color.WHITE);
+        performanceStatsPanel.setBorder(BorderFactory.createTitledBorder("Performance Stats"));
 
-        contentPanel.add(dashboardCard, "Dashboard");
+        taskCompletionLabel = new JLabel("Task Completion:");
+        taskCompletionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        taskProgressBar = new JProgressBar(0, 100);
+        taskProgressBar.setValue(60);
+        taskProgressBar.setStringPainted(true);
+        taskProgressBar.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        add(contentPanel, BorderLayout.CENTER);
+        goalsCompletionLabel = new JLabel("Goals Completion: 75%");
+        goalsCompletionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JButton addTaskButton = new JButton("Add Task");
+        addTaskButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        addTaskButton.setBackground(new Color(70, 130, 180));
+        addTaskButton.setForeground(Color.WHITE);
+        addTaskButton.setFocusPainted(false);
+        addTaskButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        addTaskButton.setMaximumSize(new Dimension(120, 35));
+        addTaskButton.setName("addTaskButton");
+
+        performanceStatsPanel.add(taskCompletionLabel);
+        performanceStatsPanel.add(taskProgressBar);
+        performanceStatsPanel.add(goalsCompletionLabel);
+        performanceStatsPanel.add(Box.createVerticalStrut(10));
+        performanceStatsPanel.add(addTaskButton);
+
+        return performanceStatsPanel;
+    }
+
+    private JPanel createTaskPanel() {
+        taskPanel = new JPanel();
+        taskPanel.setLayout(new BorderLayout());
+        taskPanel.setPreferredSize(new Dimension(630, 200));
+        taskPanel.setBackground(Color.WHITE);
+        taskPanel.setBorder(BorderFactory.createTitledBorder("Tasks"));
+
+        JPanel taskListPanel = new JPanel();
+        taskListPanel.setLayout(new BoxLayout(taskListPanel, BoxLayout.Y_AXIS));
+        taskListPanel.setBackground(new Color(245, 245, 245));
+
+        taskListPanel.add(new TaskPanel("UI Redesign", "Refactor the TaskPanel layout to be more compact and stylish.", "In Progress", 7));
+        taskListPanel.add(Box.createVerticalStrut(8));
+        taskListPanel.add(new TaskPanel("Bug Fix", "Resolve the layout overflow issue in task section.", "Pending", 5));
+        taskListPanel.add(Box.createVerticalStrut(8));
+        taskListPanel.add(new TaskPanel("Feature Add", "Add real-time notifications for task changes.", "Completed", 10));
+
+        JScrollPane scrollPane = new JScrollPane(taskListPanel);
+        scrollPane.setBorder(null);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(12);
+
+        taskPanel.add(scrollPane, BorderLayout.CENTER);
+        return taskPanel;
     }
 
     private JButton createSidebarButton(String text, Color bgColor) {
         JButton button = new JButton(text);
         button.setFocusPainted(false);
         button.setAlignmentX(Component.CENTER_ALIGNMENT);
-        button.setMaximumSize(new Dimension(160, 35));
+        button.setMaximumSize(new Dimension(160, 40));
         button.setBackground(bgColor);
         button.setForeground(Color.WHITE);
         button.setFont(new Font("SansSerif", Font.BOLD, 13));
+        button.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
         return button;
     }
 
-    private void styleTimerButton(JButton button) {
+    private JButton createActionButton(String text) {
+        JButton button = new JButton(text);
         button.setFocusPainted(false);
         button.setBackground(new Color(100, 181, 246));
         button.setForeground(Color.BLACK);
         button.setFont(new Font("SansSerif", Font.BOLD, 13));
-        button.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
+        button.setPreferredSize(new Dimension(120, 35));
+        return button;
     }
 
     private String getCurrentDate() {

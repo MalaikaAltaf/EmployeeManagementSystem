@@ -1,5 +1,11 @@
 package controllers;
 
+
+import java.awt.Component;
+import  java.awt.GridLayout;
+
+
+
 import views.EmployeeDashboardView;
 import views.EmployeeLeaveView;
 import controllers.EmployeeLeaveController;
@@ -17,6 +23,14 @@ import java.time.format.DateTimeFormatter;
 import views.SettingsView; // ✅ NEW
 import controllers.SettingsController; // ✅ NEW
 
+import models.EmployeeTaskModel;
+import models.EmployeeTaskModel.Task;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.util.List;
+
 public class EmployeeDashboardController {
     private EmployeeDashboardView view;
     private Timer timer;
@@ -25,6 +39,8 @@ public class EmployeeDashboardController {
     private boolean onBreak = false;
     private String employeeName;
     private int empId;
+
+    private EmployeeTaskModel taskModel;
 
     // ✅ Leave View and Controller
     private EmployeeLeaveView leaveView;
@@ -42,11 +58,24 @@ public class EmployeeDashboardController {
     private SettingsView settingsView;
     private SettingsController settingsController;
 
+    // At the top with other fields
+    private views.ChatView chatView;
+    private controllers.ChatController chatController;
+
+
     public EmployeeDashboardController(String employeeName, int empId) {
         this.employeeName = employeeName;
         this.empId = empId;
 
         view = new EmployeeDashboardView(employeeName);
+
+        // Initialize task model with DB connection
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/your_database_name", "username", "password");
+            taskModel = new EmployeeTaskModel(conn);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // ✅ Initialize Leave View/Controller
         leaveView = new EmployeeLeaveView();
@@ -68,9 +97,17 @@ public class EmployeeDashboardController {
         settingsController = new SettingsController(settingsView, new EmployeeModel(), empId);
         view.contentPanel.add(settingsView, "Settings");
 
+        // Initialize and add chat
+        chatView = new views.ChatView();
+        chatController = new controllers.ChatController(chatView, employeeName);
+        view.contentPanel.add(chatView, "Chat");
+
+
         initController();
         view.setVisible(true);
         startTimers();
+
+        
     }
 
     private void initController() {
@@ -78,6 +115,11 @@ public class EmployeeDashboardController {
 
         view.dashboardBtn.addActionListener(e -> {
             view.cardLayout.show(view.contentPanel, "Dashboard");
+        });
+
+        // ✅ Chat Button Handler
+        view.chatButton.addActionListener(_ -> {
+            view.cardLayout.show(view.contentPanel, "Chat");
         });
 
         // ✅ Show Profile Panel when "My Profile" is clicked
@@ -104,6 +146,14 @@ public class EmployeeDashboardController {
 
         view.startBreakBtn.addActionListener(_ -> onBreak = true);
         view.endBreakBtn.addActionListener(_ -> onBreak = false);
+
+        // Add Task Button Handler
+        view.performanceStatsPanel.getComponents();
+        for (Component comp : view.performanceStatsPanel.getComponents()) {
+            if (comp instanceof JButton && "addTaskButton".equals(comp.getName())) {
+                ((JButton) comp).addActionListener(e -> showAddTaskDialog());
+            }
+        }
     }
 
     private void startTimers() {
@@ -149,5 +199,93 @@ private void handleLogout() {
         System.out.println("Logged out!");
     }
 }
+private void showAddTaskDialog() {
+    JTextField titleField = new JTextField(20);
+    JTextArea descriptionArea = new JTextArea(5, 20);
+    descriptionArea.setLineWrap(true);
+    descriptionArea.setWrapStyleWord(true);
+
+    JComboBox<String> statusComboBox = new JComboBox<>(new String[]{"Pending", "In Progress", "Completed"});
+    JTextField startDateField = new JTextField(LocalDate.now().toString());
+    JTextField endDateField = new JTextField(LocalDate.now().plusDays(7).toString());
+    JTextField performanceRatingField = new JTextField("5");
+
+    JPanel panel = new JPanel(new GridLayout(0, 1));
+    panel.add(new JLabel("Task Title:"));
+    panel.add(titleField);
+    panel.add(new JLabel("Task Description:"));
+    panel.add(new JScrollPane(descriptionArea));
+    panel.add(new JLabel("Status:"));
+    panel.add(statusComboBox);
+    panel.add(new JLabel("Start Date (YYYY-MM-DD):"));
+    panel.add(startDateField);
+    panel.add(new JLabel("End Date (YYYY-MM-DD):"));
+    panel.add(endDateField);
+    panel.add(new JLabel("Performance Rating (1-10):"));
+    panel.add(performanceRatingField);
+
+    int result = JOptionPane.showConfirmDialog(view, panel, "Add New Task",
+            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+    if (result == JOptionPane.OK_OPTION) {
+        try {
+            String title = titleField.getText().trim();
+            String description = descriptionArea.getText().trim();
+            String status = (String) statusComboBox.getSelectedItem();
+            Date startDate = Date.valueOf(startDateField.getText().trim());
+            Date endDate = Date.valueOf(endDateField.getText().trim());
+            int performanceRating = Integer.parseInt(performanceRatingField.getText().trim());
+
+            boolean success = taskModel.addTask(empId, title, description, status, startDate, endDate, performanceRating);
+            if (success) {
+                JOptionPane.showMessageDialog(view, "Task added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                updatePerformanceStats();
+                refreshTaskList();
+            } else {
+                JOptionPane.showMessageDialog(view, "Failed to add task.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(view, "Invalid input: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+}
+private void updatePerformanceStats() {
+    List<Task> tasks = taskModel.getTasksByEmployee(empId);
+    if (tasks.isEmpty()) {
+        view.taskProgressBar.setValue(0);
+        view.goalsCompletionLabel.setText("Goals Completion: 0%");
+        return;
+    }
+    int totalRating = 0;
+    int completedTasks = 0;
+    for (Task task : tasks) {
+        totalRating += task.performanceRating;
+        if ("Completed".equalsIgnoreCase(task.status)) {
+            completedTasks++;
+        }
+    }
+    int avgRating = totalRating / tasks.size();
+    int completionPercent = (int) ((completedTasks / (double) tasks.size()) * 100);
+
+    view.taskProgressBar.setValue(completionPercent);
+    view.goalsCompletionLabel.setText("Goals Completion: " + completionPercent + "%");
+}
+
+private void refreshTaskList() {
+    List<Task> tasks = taskModel.getTasksByEmployee(empId);
+    view.taskPanel.removeAll();
+    for (Task task : tasks) {
+        views.TaskPanel taskPanel = new views.TaskPanel(task.title, task.description, task.status, task.performanceRating);
+        view.taskPanel.add(taskPanel);
+        view.taskPanel.add(Box.createVerticalStrut(10));
+    }
+    view.taskPanel.revalidate();
+    view.taskPanel.repaint();
+}
+
+
+
+
 
 }
