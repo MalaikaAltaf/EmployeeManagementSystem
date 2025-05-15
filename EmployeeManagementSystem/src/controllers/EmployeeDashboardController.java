@@ -41,6 +41,8 @@ public class EmployeeDashboardController {
     private String employeeName;
     private int empId;
 
+    private String currentView = "Dashboard"; // Track current visible view
+
     private EmployeeTaskModel taskModel;
 
     // ✅ Leave View and Controller
@@ -107,7 +109,8 @@ public class EmployeeDashboardController {
         initController();
         view.setVisible(true);
         startTimers();
-
+        updatePerformanceStats();
+        refreshTaskList();
         
     }
 
@@ -116,33 +119,39 @@ public class EmployeeDashboardController {
 
         view.dashboardBtn.addActionListener(e -> {
             view.cardLayout.show(view.contentPanel, "Dashboard");
+            currentView = "Dashboard";
         });
 
         // ✅ Chat Button Handler
         view.chatButton.addActionListener(_ -> {
             view.cardLayout.show(view.contentPanel, "Chat");
+            currentView = "Chat";
         });
 
         // ✅ Show Profile Panel when "My Profile" is clicked
         view.profileBtn.addActionListener(e -> {
             profileController.loadEmployeeProfile(); // optional: refresh data
             view.cardLayout.show(view.contentPanel, "Profile");
+            currentView = "Profile";
         });
 
         view.leaveBtn.addActionListener(e -> {
             leaveController.refreshLeaveTable();
             view.cardLayout.show(view.contentPanel, "Leave");
+            currentView = "Leave";
         });
 
         // ✅ Show Salary Panel when "Salary" is clicked
         view.salaryBtn.addActionListener(e -> {
             salaryController.loadSalaryData(); // optional: refresh salary data
             view.cardLayout.show(view.contentPanel, "Salary");
+            currentView = "Salary";
         });
 
         // ✅ Show Settings Panel when "Setting" is clicked
         view.settingBtn.addActionListener(e -> {
             view.cardLayout.show(view.contentPanel, "Settings");
+            currentView = "Settings";
         });
 
         view.startBreakBtn.addActionListener(_ -> onBreak = true);
@@ -160,6 +169,10 @@ public class EmployeeDashboardController {
     private void startTimers() {
         timer = new Timer(1000, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                if (!"Dashboard".equals(currentView)) {
+                    // Do not count time if not on Dashboard view
+                    return;
+                }
                 if (onBreak) {
                     breakSeconds++;
                     view.breakTimeLabel.setText("Break Time: " + formatTime(breakSeconds));

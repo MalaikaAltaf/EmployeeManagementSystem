@@ -35,22 +35,24 @@ public class ChatController {
         }
     }
 
-    private void sendMessage(String username) {
-        String message = view.inputField.getText().trim();
-        if (!message.isEmpty()) {
-            out.println(username + ": " + message);
-            view.inputField.setText("");
-        }
-    }
 
     private void listenForMessages() {
         try {
             String msg;
             while ((msg = in.readLine()) != null) {
-                view.chatArea.append(msg + "\n");
+                view.addMessage(msg, false);
             }
         } catch (IOException e) {
             System.out.println("Connection to server lost.");
+        }
+    }
+
+    private void sendMessage(String username) {
+        String message = view.inputField.getText().trim();
+        if (!message.isEmpty()) {
+            out.println(username + ": " + message);
+            view.addMessage(username + ": " + message, true);
+            view.inputField.setText("");
         }
     }
 }

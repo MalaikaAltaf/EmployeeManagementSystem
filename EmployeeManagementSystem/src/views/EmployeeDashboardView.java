@@ -1,7 +1,7 @@
-// Keep your package declaration
 package views;
 
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -30,7 +30,7 @@ public class EmployeeDashboardView extends JFrame {
 
     public EmployeeDashboardView(String employeeName) {
         setTitle("Employee Dashboard");
-        setSize(1000, 640);
+        setSize(1100, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null); // Center window
         setLayout(new BorderLayout());
@@ -70,14 +70,14 @@ public class EmployeeDashboardView extends JFrame {
 
         welcomeLabel = new JLabel("  Welcome, " + employeeName);
         welcomeLabel.setForeground(Color.WHITE);
-        welcomeLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
+        welcomeLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
 
         logoutBtn = new JButton("Log Out");
         logoutBtn.setFocusPainted(false);
         logoutBtn.setBackground(new Color(211, 47, 47));
         logoutBtn.setForeground(Color.WHITE);
-        logoutBtn.setFont(new Font("SansSerif", Font.BOLD, 12));
-        logoutBtn.setPreferredSize(new Dimension(100, 30));
+        logoutBtn.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        logoutBtn.setPreferredSize(new Dimension(110, 35));
 
         JPanel logoutPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 10));
         logoutPanel.setOpaque(false);
@@ -92,16 +92,16 @@ public class EmployeeDashboardView extends JFrame {
     private void initContentPanel(String employeeName) {
         cardLayout = new CardLayout();
         contentPanel = new JPanel(cardLayout);
-        contentPanel.setBackground(Color.WHITE);
+        contentPanel.setBackground(new Color(250, 250, 250));
 
         dashboardCard = new JPanel(new GridBagLayout());
         dashboardCard.setBackground(new Color(245, 245, 245));
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(20, 20, 20, 20);
+        gbc.insets = new Insets(30, 30, 30, 30);
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.anchor = GridBagConstraints.CENTER;
 
         JPanel timerPanel = createTimerPanel(employeeName);
         dashboardCard.add(timerPanel, gbc);
@@ -121,7 +121,7 @@ public class EmployeeDashboardView extends JFrame {
 
         // Placeholder chat panel
         chatPanel = new JPanel();
-        chatPanel.setBackground(Color.WHITE);
+        chatPanel.setBackground(new Color(250, 250, 250));
         chatPanel.setLayout(new BorderLayout());
         chatPanel.add(new JLabel("Chat with Admin (coming soon)", SwingConstants.CENTER), BorderLayout.CENTER);
 
@@ -132,22 +132,29 @@ public class EmployeeDashboardView extends JFrame {
     }
 
     private JPanel createTimerPanel(String employeeName) {
-        JPanel panel = new JPanel(new GridLayout(7, 1, 5, 5));
-        panel.setPreferredSize(new Dimension(300, 230));
+        JPanel panel = new JPanel(new GridLayout(7, 1, 8, 8));
+        panel.setPreferredSize(new Dimension(350, 270));
         panel.setBackground(Color.WHITE);
-        panel.setBorder(BorderFactory.createTitledBorder("Work Session Info"));
+        panel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder("Work Session Info"),
+                BorderFactory.createLineBorder(new Color(100, 149, 237), 2)
+        ));
 
         JLabel nameDisplay = new JLabel(employeeName, SwingConstants.CENTER);
-        nameDisplay.setFont(new Font("SansSerif", Font.BOLD, 18));
+        nameDisplay.setFont(new Font("Segoe UI", Font.BOLD, 20));
         nameDisplay.setForeground(new Color(33, 40, 48));
 
         dateLabel = new JLabel("Date: " + getCurrentDate(), SwingConstants.CENTER);
-        workingTimeLabel = new JLabel("Working Time: 00:00:00", SwingConstants.CENTER);
-        breakTimeLabel = new JLabel("Break Time: 00:00:00", SwingConstants.CENTER);
+        dateLabel.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        dateLabel.setForeground(new Color(80, 80, 80));
 
-        dateLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        workingTimeLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        breakTimeLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        workingTimeLabel = new JLabel("Working Time: 00:00:00", SwingConstants.CENTER);
+        workingTimeLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        workingTimeLabel.setForeground(new Color(30, 144, 255)); // Dodger Blue
+
+        breakTimeLabel = new JLabel("Break Time: 00:00:00", SwingConstants.CENTER);
+        breakTimeLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        breakTimeLabel.setForeground(new Color(255, 69, 0)); // Orange Red
 
         startBreakBtn = createActionButton("Start Break");
         endBreakBtn = createActionButton("End Break");
@@ -165,12 +172,18 @@ public class EmployeeDashboardView extends JFrame {
     private JPanel createPerformanceStatsPanel() {
         performanceStatsPanel = new JPanel();
         performanceStatsPanel.setLayout(new BoxLayout(performanceStatsPanel, BoxLayout.Y_AXIS));
-        performanceStatsPanel.setPreferredSize(new Dimension(300, 230));
+        performanceStatsPanel.setPreferredSize(new Dimension(350, 270));
         performanceStatsPanel.setBackground(Color.WHITE);
-        performanceStatsPanel.setBorder(BorderFactory.createTitledBorder("Performance Stats"));
+        performanceStatsPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder("Performance Stats"),
+                BorderFactory.createLineBorder(new Color(100, 149, 237), 2)
+        ));
 
         taskCompletionLabel = new JLabel("Task Completion:");
         taskCompletionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        taskCompletionLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        taskCompletionLabel.setForeground(new Color(33, 40, 48));
+
         taskProgressBar = new JProgressBar(0, 100);
         taskProgressBar.setValue(60);
         taskProgressBar.setStringPainted(true);
@@ -178,20 +191,22 @@ public class EmployeeDashboardView extends JFrame {
 
         goalsCompletionLabel = new JLabel("Goals Completion: 75%");
         goalsCompletionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        goalsCompletionLabel.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        goalsCompletionLabel.setForeground(new Color(33, 40, 48));
 
         JButton addTaskButton = new JButton("Add Task");
         addTaskButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         addTaskButton.setBackground(new Color(70, 130, 180));
         addTaskButton.setForeground(Color.WHITE);
         addTaskButton.setFocusPainted(false);
-        addTaskButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        addTaskButton.setMaximumSize(new Dimension(120, 35));
+        addTaskButton.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        addTaskButton.setMaximumSize(new Dimension(140, 40));
         addTaskButton.setName("addTaskButton");
 
         performanceStatsPanel.add(taskCompletionLabel);
         performanceStatsPanel.add(taskProgressBar);
         performanceStatsPanel.add(goalsCompletionLabel);
-        performanceStatsPanel.add(Box.createVerticalStrut(10));
+        performanceStatsPanel.add(Box.createVerticalStrut(15));
         performanceStatsPanel.add(addTaskButton);
 
         return performanceStatsPanel;
@@ -200,18 +215,21 @@ public class EmployeeDashboardView extends JFrame {
     private JPanel createTaskPanel() {
         taskPanel = new JPanel();
         taskPanel.setLayout(new BorderLayout());
-        taskPanel.setPreferredSize(new Dimension(630, 200));
+        taskPanel.setPreferredSize(new Dimension(740, 250));
         taskPanel.setBackground(Color.WHITE);
-        taskPanel.setBorder(BorderFactory.createTitledBorder("Tasks"));
+        taskPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder("Tasks"),
+                BorderFactory.createLineBorder(new Color(100, 149, 237), 2)
+        ));
 
         taskListPanel = new JPanel();
         taskListPanel.setLayout(new BoxLayout(taskListPanel, BoxLayout.Y_AXIS));
         taskListPanel.setBackground(new Color(245, 245, 245));
 
         taskListPanel.add(new TaskPanel("UI Redesign", "Refactor the TaskPanel layout to be more compact and stylish.", "In Progress", 7));
-        taskListPanel.add(Box.createVerticalStrut(8));
+        taskListPanel.add(Box.createVerticalStrut(10));
         taskListPanel.add(new TaskPanel("Bug Fix", "Resolve the layout overflow issue in task section.", "Pending", 5));
-        taskListPanel.add(Box.createVerticalStrut(8));
+        taskListPanel.add(Box.createVerticalStrut(10));
         taskListPanel.add(new TaskPanel("Feature Add", "Add real-time notifications for task changes.", "Completed", 10));
 
         JScrollPane scrollPane = new JScrollPane(taskListPanel);
@@ -227,21 +245,21 @@ public class EmployeeDashboardView extends JFrame {
         JButton button = new JButton(text);
         button.setFocusPainted(false);
         button.setAlignmentX(Component.CENTER_ALIGNMENT);
-        button.setMaximumSize(new Dimension(160, 40));
+        button.setMaximumSize(new Dimension(160, 45));
         button.setBackground(bgColor);
         button.setForeground(Color.WHITE);
-        button.setFont(new Font("SansSerif", Font.BOLD, 13));
-        button.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
+        button.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        button.setBorder(BorderFactory.createEmptyBorder(10, 14, 10, 14));
         return button;
     }
 
     private JButton createActionButton(String text) {
         JButton button = new JButton(text);
         button.setFocusPainted(false);
-        button.setBackground(new Color(100, 181, 246));
-        button.setForeground(Color.BLACK);
-        button.setFont(new Font("SansSerif", Font.BOLD, 13));
-        button.setPreferredSize(new Dimension(120, 35));
+        button.setBackground(new Color(70, 130, 180));
+        button.setForeground(Color.WHITE);
+        button.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        button.setPreferredSize(new Dimension(130, 40));
         return button;
     }
 
