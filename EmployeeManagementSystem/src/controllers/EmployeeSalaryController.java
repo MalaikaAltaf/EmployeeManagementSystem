@@ -16,7 +16,7 @@ public class EmployeeSalaryController {
         this.empId = empId;
 
         // Adding listeners to the buttons
-        view.filterButton.addActionListener(e -> loadSalaryDataByStatus());
+        view.filterButton.addActionListener(e -> loadSalaryDataByMonth());
         view.downloadPayslipButton.addActionListener(e -> downloadPayslip());
     }
 
@@ -26,18 +26,24 @@ public class EmployeeSalaryController {
         view.updateSalaryTable(data);
     }
 
-    // Load salary data based on the selected status
-    public void loadSalaryDataByStatus() {
-        String status = view.getSelectedStatus();
+    // Load salary data based on the selected month
+    public void loadSalaryDataByMonth() {
+        String month = view.getSelectedMonth();
 
-        if (status == null || status.isEmpty()) {
-            JOptionPane.showMessageDialog(view, "Please select a status.", "Input Error", JOptionPane.WARNING_MESSAGE);
+        if (month == null || month.isEmpty()) {
+            JOptionPane.showMessageDialog(view, "Please select a month.", "Input Error", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        List<String[]> filteredData = model.fetchSalaryByStatus(empId, status);
+        // Convert month name to start and end date strings (YYYY-MM-DD)
+        String year = java.time.LocalDate.now().getYear() + "";
+        int monthNumber = java.time.Month.valueOf(month.toUpperCase()).getValue();
+        String startDate = String.format("%s-%02d-01", year, monthNumber);
+        String endDate = String.format("%s-%02d-%02d", year, monthNumber, java.time.YearMonth.of(Integer.parseInt(year), monthNumber).lengthOfMonth());
+
+        List<String[]> filteredData = model.fetchSalaryByDateRange(empId, startDate, endDate);
         if (filteredData.isEmpty()) {
-            JOptionPane.showMessageDialog(view, "No salary records found for the selected status.", "No Data", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(view, "No salary records found for the selected month.", "No Data", JOptionPane.INFORMATION_MESSAGE);
         } else {
             view.updateSalaryTable(filteredData);
         }

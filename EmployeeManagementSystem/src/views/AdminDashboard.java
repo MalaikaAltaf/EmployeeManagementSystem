@@ -6,7 +6,9 @@ import controllers.AdminDashboardController;
 
 public class AdminDashboard extends JFrame {
 
+    private JButton homeButton;  // <-- Added homeButton here
     private JButton employeeButton, departmentsButton, salaryButton, leaveButton, settingsButton;
+    private JButton chatButton;
     private JPanel mainPanel;
     private JButton logoutButton;
 
@@ -19,7 +21,7 @@ public class AdminDashboard extends JFrame {
 
         // -------- Header Panel --------
         JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(new Color(0, 150, 136)); // Teal green (Material Design)
+        headerPanel.setBackground(new Color(0, 150, 136)); // Teal green
         headerPanel.setPreferredSize(new Dimension(getWidth(), 70));
 
         JLabel welcomeLabel = new JLabel("👑 Welcome, Admin!", SwingConstants.CENTER);
@@ -27,7 +29,7 @@ public class AdminDashboard extends JFrame {
         welcomeLabel.setFont(new Font("Arial", Font.BOLD, 26));
         headerPanel.add(welcomeLabel, BorderLayout.CENTER);
 
-        logoutButton = new JButton("Log Out"); // Assign to class-level field
+        logoutButton = new JButton("Log Out");
         logoutButton.setBackground(new Color(192, 57, 43));
         logoutButton.setForeground(Color.WHITE);
         logoutButton.setFont(new Font("Arial", Font.BOLD, 16));
@@ -44,12 +46,17 @@ public class AdminDashboard extends JFrame {
         sidePanel.setBackground(new Color(44, 62, 80));
         sidePanel.setPreferredSize(new Dimension(200, getHeight()));
 
+        homeButton = createNavButton("Home", new Color(219, 112, 147)); // Dark Pink
+
         employeeButton = createNavButton("Employee", new Color(52, 152, 219));
         departmentsButton = createNavButton("Departments", new Color(39, 174, 96));
         salaryButton = createNavButton("Salary", new Color(241, 196, 15));
         leaveButton = createNavButton("Leave", new Color(231, 76, 60));
         settingsButton = createNavButton("Settings", new Color(155, 89, 182));
+        chatButton = createNavButton("Chat", new Color(243, 156, 18));
 
+        sidePanel.add(Box.createVerticalStrut(20));
+        sidePanel.add(homeButton);            // <-- Add Home button at top
         sidePanel.add(Box.createVerticalStrut(20));
         sidePanel.add(employeeButton);
         sidePanel.add(Box.createVerticalStrut(20));
@@ -60,6 +67,9 @@ public class AdminDashboard extends JFrame {
         sidePanel.add(leaveButton);
         sidePanel.add(Box.createVerticalStrut(20));
         sidePanel.add(settingsButton);
+        sidePanel.add(Box.createVerticalStrut(20));
+        sidePanel.add(chatButton);
+
         add(sidePanel, BorderLayout.WEST);
 
         // -------- Main Panel --------
@@ -85,18 +95,39 @@ public class AdminDashboard extends JFrame {
     }
 
     // ---------- Getters ----------
+    public JButton getHomeButton() {   // <-- Added getter for homeButton
+        return homeButton;
+    }
+
     public JButton getEmployeeButton() {
         return employeeButton;
+    }
+
+    public JButton getDepartmentsButton() {
+        return departmentsButton;
+    }
+
+    public JButton getSalaryButton() {
+        return salaryButton;
+    }
+
+    public JButton getLeaveButton() {
+        return leaveButton;
+    }
+
+    public JButton getSettingsButton() {
+        return settingsButton;
+    }
+
+    public JButton getChatButton() {
+        return chatButton;
+    }
+
+    public JButton getLogoutButton() {
+        return logoutButton;
     }
 
     public JPanel getMainPanel() {
         return mainPanel;
     }
-
-    public JButton getLogoutButton() {
-    return logoutButton;
-    }
-
-
-    // Add similar getters if you want to connect other buttons
 }

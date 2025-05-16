@@ -11,7 +11,7 @@ import java.util.List;
 public class EmployeeSalaryView extends JPanel {
     public JTable salaryTable;
     public DefaultTableModel tableModel;
-    public JComboBox<String> statusComboBox;
+    public JComboBox<String> monthComboBox;
     public JButton filterButton, downloadPayslipButton;
 
     public EmployeeSalaryView() {
@@ -25,19 +25,22 @@ public class EmployeeSalaryView extends JPanel {
         filterPanel.setBackground(Color.WHITE);
         filterPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        JLabel statusLabel = new JLabel("Status: ");
-        statusLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        JLabel monthLabel = new JLabel("Month: ");
+        monthLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 
-        statusComboBox = new JComboBox<>(new String[]{"Pending", "Paid"});
-        statusComboBox.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        statusComboBox.setToolTipText("Select payment status");
+        monthComboBox = new JComboBox<>(new String[]{
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        });
+        monthComboBox.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        monthComboBox.setToolTipText("Select month to filter salary records");
 
         filterButton = new JButton("Filter");
         filterButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
         filterButton.setBackground(new Color(70, 130, 180));
         filterButton.setForeground(Color.WHITE);
         filterButton.setFocusPainted(false);
-        filterButton.setToolTipText("Filter salary records by status");
+        filterButton.setToolTipText("Filter salary records by month");
 
         downloadPayslipButton = new JButton("Download Payslip");
         downloadPayslipButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
@@ -47,13 +50,13 @@ public class EmployeeSalaryView extends JPanel {
         downloadPayslipButton.setToolTipText("Download selected employee's payslip");
 
         // Adding components to the filter panel
-        filterPanel.add(statusLabel);
-        filterPanel.add(statusComboBox);
+        filterPanel.add(monthLabel);
+        filterPanel.add(monthComboBox);
         filterPanel.add(filterButton);
         filterPanel.add(downloadPayslipButton);
 
         // Table for salary data with improved appearance
-        String[] columnNames = {"Base Salary", "Bonuses", "Deductions", "Total Salary", "Payment Date", "Actions"};
+        String[] columnNames = {"Base Salary", "Bonuses", "Deductions", "Total Salary", "Payment Date"};
         tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -75,10 +78,10 @@ public class EmployeeSalaryView extends JPanel {
         header.setBackground(new Color(220, 220, 220));
         header.setForeground(Color.DARK_GRAY);
 
-        // Center align all columns except Actions
+        // Center align all columns
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-        for (int i = 0; i < salaryTable.getColumnCount() - 1; i++) {
+        for (int i = 0; i < salaryTable.getColumnCount(); i++) {
             salaryTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
         }
 
@@ -88,7 +91,6 @@ public class EmployeeSalaryView extends JPanel {
         salaryTable.getColumnModel().getColumn(2).setPreferredWidth(90);  // Deductions
         salaryTable.getColumnModel().getColumn(3).setPreferredWidth(100); // Total Salary
         salaryTable.getColumnModel().getColumn(4).setPreferredWidth(110); // Payment Date
-        salaryTable.getColumnModel().getColumn(5).setPreferredWidth(120); // Actions
 
         // Adding filter panel and salary table to the main panel
         add(filterPanel, BorderLayout.NORTH);
@@ -103,8 +105,8 @@ public class EmployeeSalaryView extends JPanel {
         }
     }
 
-    // Method to get the selected status from combo box
-    public String getSelectedStatus() {
-        return (String) statusComboBox.getSelectedItem();
+    // Method to get the selected month from combo box
+    public String getSelectedMonth() {
+        return (String) monthComboBox.getSelectedItem();
     }
 }

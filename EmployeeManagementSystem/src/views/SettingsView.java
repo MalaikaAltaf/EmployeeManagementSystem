@@ -3,12 +3,8 @@ package views;
 import javax.swing.*;
 import java.awt.*;
 
-
 import utils.ThemeManager;
 import utils.ThemeManager.Theme;
-
-import javax.swing.*;
-import java.awt.*;
 
 public class SettingsView extends JPanel {
     public JLabel currentPasswordLabel, newPasswordLabel, confirmPasswordLabel, messageLabel;
@@ -34,6 +30,10 @@ public class SettingsView extends JPanel {
 
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBackground(Color.WHITE);
+        formPanel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(0, 120, 140), 2, true),
+            BorderFactory.createEmptyBorder(50, 50, 50, 50)  // Increased padding for more space
+        ));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 15, 10, 15);
         gbc.fill = GridBagConstraints.HORIZONTAL;

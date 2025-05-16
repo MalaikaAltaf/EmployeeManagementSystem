@@ -29,6 +29,7 @@ import views.SettingsView; // ✅ NEW
 import controllers.SettingsController; // ✅ NEW
 
 import models.EmployeeTaskModel;
+import models.NotificationModel;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Date;
@@ -47,6 +48,7 @@ public class EmployeeDashboardController {
     private String currentView = "Dashboard"; // Track current visible view
 
     private EmployeeTaskModel taskModel;
+    private NotificationModel notificationModel;
 
     // ✅ Leave View and Controller
     private EmployeeLeaveView leaveView;
@@ -79,6 +81,7 @@ public class EmployeeDashboardController {
         try {
             Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/EMS1", "root", "root1122");
             taskModel = new EmployeeTaskModel(conn);
+            notificationModel = new NotificationModel(conn);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -114,7 +117,7 @@ public class EmployeeDashboardController {
         startTimers();
         updatePerformanceStats();
         refreshTaskList();
-        
+        refreshNotifications();
     }
 
     private void initController() {
@@ -167,6 +170,9 @@ public class EmployeeDashboardController {
                 ((JButton) comp).addActionListener(e -> showAddTaskDialog());
             }
         }
+
+        // Notification Button Handler
+        view.notificationBtn.addActionListener(e -> toggleNotificationPanel());
     }
 
     private void startTimers() {
@@ -188,6 +194,9 @@ public class EmployeeDashboardController {
             }
         });
         timer.start();
+
+        // Start notification refresh timer every 5 minutes
+        new Timer(5 * 60 * 1000, e -> refreshNotifications()).start();
     }
 
     private String formatTime(int totalSeconds) {
@@ -195,6 +204,26 @@ public class EmployeeDashboardController {
         int mins = (totalSeconds % 3600) / 60;
         int secs = totalSeconds % 60;
         return String.format("%02d:%02d:%02d", hrs, mins, secs);
+    }
+
+    private void refreshNotifications() {
+        if (notificationModel == null) return;
+        List<NotificationModel.Notification> notifications = notificationModel.getAllNotifications(empId);
+        view.updateNotificationList(notifications);
+    }
+
+    private void toggleNotificationPanel() {
+        boolean isVisible = view.notificationPanel.isVisible();
+        if (!isVisible) {
+            // Show notification panel and hide task panel to avoid UI disturbance
+            view.notificationPanel.setVisible(true);
+            view.taskPanel.setVisible(false);
+            refreshNotifications();
+        } else {
+            // Hide notification panel and show task panel
+            view.notificationPanel.setVisible(false);
+            view.taskPanel.setVisible(true);
+        }
     }
 
     private String getCurrentDate() {

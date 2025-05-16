@@ -5,6 +5,7 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class EmployeeDashboardView extends JFrame {
     public JPanel sidebarPanel, contentPanel, topBarPanel;
@@ -24,6 +25,10 @@ public class EmployeeDashboardView extends JFrame {
 
     public JButton chatButton;
 
+    public JButton notificationBtn;
+    public JPanel notificationPanel;
+    public JPanel notificationListPanel;
+
     public CardLayout cardLayout;
     public JPanel dashboardCard;
     public JPanel chatPanel;
@@ -32,7 +37,7 @@ public class EmployeeDashboardView extends JFrame {
         setTitle("Employee Dashboard");
         setSize(1100, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null); // Center window
+        setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
         initSidebar();
@@ -52,7 +57,7 @@ public class EmployeeDashboardView extends JFrame {
         salaryBtn = createSidebarButton("Salary", new Color(251, 192, 45));
         leaveBtn = createSidebarButton("Leave", new Color(230, 74, 25));
         settingBtn = createSidebarButton("Setting", new Color(171, 71, 188));
-        chatButton = createSidebarButton("Chat", new Color(3, 169, 244)); // Chat Button added
+        chatButton = createSidebarButton("Chat", new Color(3, 169, 244));
 
         JButton[] navButtons = {dashboardBtn, profileBtn, salaryBtn, leaveBtn, settingBtn, chatButton};
         for (JButton btn : navButtons) {
@@ -79,8 +84,16 @@ public class EmployeeDashboardView extends JFrame {
         logoutBtn.setFont(new Font("Segoe UI", Font.BOLD, 14));
         logoutBtn.setPreferredSize(new Dimension(110, 35));
 
+        notificationBtn = new JButton("Notifications");
+        notificationBtn.setFocusPainted(false);
+        notificationBtn.setBackground(new Color(251, 192, 45));
+        notificationBtn.setForeground(Color.WHITE);
+        notificationBtn.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        notificationBtn.setPreferredSize(new Dimension(140, 35));
+
         JPanel logoutPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 10));
         logoutPanel.setOpaque(false);
+        logoutPanel.add(notificationBtn);
         logoutPanel.add(logoutBtn);
 
         topBarPanel.add(welcomeLabel, BorderLayout.WEST);
@@ -116,16 +129,19 @@ public class EmployeeDashboardView extends JFrame {
         JPanel taskPanel = createTaskPanel();
         dashboardCard.add(taskPanel, gbc);
 
-        // Add dashboard card
+        gbc.gridy++;
+        gbc.gridwidth = 2;
+        notificationPanel = createNotificationPanel();
+        notificationPanel.setVisible(false);
+        dashboardCard.add(notificationPanel, gbc);
+
         contentPanel.add(dashboardCard, "Dashboard");
 
-        // Placeholder chat panel
         chatPanel = new JPanel();
         chatPanel.setBackground(new Color(250, 250, 250));
         chatPanel.setLayout(new BorderLayout());
         chatPanel.add(new JLabel("Chat with Admin (coming soon)", SwingConstants.CENTER), BorderLayout.CENTER);
 
-        // Add chat card
         contentPanel.add(chatPanel, "Chat");
 
         add(contentPanel, BorderLayout.CENTER);
@@ -150,11 +166,11 @@ public class EmployeeDashboardView extends JFrame {
 
         workingTimeLabel = new JLabel("Working Time: 00:00:00", SwingConstants.CENTER);
         workingTimeLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        workingTimeLabel.setForeground(new Color(30, 144, 255)); // Dodger Blue
+        workingTimeLabel.setForeground(new Color(30, 144, 255));
 
         breakTimeLabel = new JLabel("Break Time: 00:00:00", SwingConstants.CENTER);
         breakTimeLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        breakTimeLabel.setForeground(new Color(255, 69, 0)); // Orange Red
+        breakTimeLabel.setForeground(new Color(255, 69, 0));
 
         startBreakBtn = createActionButton("Start Break");
         endBreakBtn = createActionButton("End Break");
@@ -253,6 +269,29 @@ public class EmployeeDashboardView extends JFrame {
         return button;
     }
 
+    private JPanel createNotificationPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder("Notifications"),
+                BorderFactory.createLineBorder(new Color(100, 149, 237), 2)
+        ));
+        panel.setPreferredSize(new Dimension(700, 150));
+
+        notificationListPanel = new JPanel();
+        notificationListPanel.setLayout(new BoxLayout(notificationListPanel, BoxLayout.Y_AXIS));
+        notificationListPanel.setBackground(Color.WHITE);
+
+        JScrollPane scrollPane = new JScrollPane(notificationListPanel);
+        scrollPane.setBorder(null);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(12);
+
+        panel.add(scrollPane);
+        return panel;
+    }
+
     private JButton createActionButton(String text) {
         JButton button = new JButton(text);
         button.setFocusPainted(false);
@@ -261,6 +300,34 @@ public class EmployeeDashboardView extends JFrame {
         button.setFont(new Font("Segoe UI", Font.BOLD, 15));
         button.setPreferredSize(new Dimension(130, 40));
         return button;
+    }
+
+    public void updateNotificationList(List<models.NotificationModel.Notification> notifications) {
+        notificationListPanel.removeAll();
+        if (notifications.isEmpty()) {
+            JLabel noNotifLabel = new JLabel("No new notifications");
+            noNotifLabel.setFont(new Font("Segoe UI", Font.ITALIC, 14));
+            noNotifLabel.setForeground(Color.GRAY);
+            noNotifLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            notificationListPanel.add(noNotifLabel);
+        } else {
+            for (models.NotificationModel.Notification notif : notifications) {
+                JLabel notifLabel = new JLabel("• " + notif.message);
+                notifLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+                notifLabel.setOpaque(true);
+                notifLabel.setBackground(Color.WHITE);
+                notifLabel.setForeground(new Color(33, 40, 48));
+                notifLabel.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(new Color(100, 149, 237), 2),
+                        BorderFactory.createEmptyBorder(10, 14, 10, 14)
+                ));
+                notifLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+                notificationListPanel.add(notifLabel);
+                notificationListPanel.add(Box.createVerticalStrut(5));
+            }
+        }
+        notificationListPanel.revalidate();
+        notificationListPanel.repaint();
     }
 
     private String getCurrentDate() {

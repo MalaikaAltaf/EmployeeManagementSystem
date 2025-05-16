@@ -41,9 +41,18 @@ public class ChatView extends JPanel {
         bottomPanel.add(inputField, BorderLayout.CENTER);
         bottomPanel.add(sendButton, BorderLayout.EAST);
 
-        // Add components to main panel
-        add(scrollPane, BorderLayout.CENTER);
-        add(bottomPanel, BorderLayout.SOUTH);
+        // New panel to wrap scrollPane and bottomPanel with border and padding
+        JPanel mainContentPanel = new JPanel(new BorderLayout());
+        mainContentPanel.setBackground(Color.WHITE);
+        mainContentPanel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(0, 120, 140), 2, true),
+            BorderFactory.createEmptyBorder(20, 20, 20, 20)
+        ));
+        mainContentPanel.add(scrollPane, BorderLayout.CENTER);
+        mainContentPanel.add(bottomPanel, BorderLayout.SOUTH);
+
+        // Add mainContentPanel to ChatView
+        add(mainContentPanel, BorderLayout.CENTER);
     }
 
     // Public method to add a message to the chat panel
