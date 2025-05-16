@@ -43,7 +43,9 @@ public class LoginController {
                 showStyledMessage("✅ Login successful as " + role + "!", "Success", JOptionPane.INFORMATION_MESSAGE);
 
                 if (role.equals("Admin")) {
-                    new AdminDashboard().setVisible(true);
+                    // Use Strategy pattern to show dashboard
+                    strategies.RoleStrategy strategy = new strategies.AdminStrategy();
+                    strategy.showDashboard();
                 } else {
                     String firstName = rs.getString("first_name");
                     String lastName = rs.getString("last_name");
@@ -51,7 +53,8 @@ public class LoginController {
                     String empName = firstName + " " + lastName;
 
                     javax.swing.SwingUtilities.invokeLater(() -> {
-                        new controllers.EmployeeDashboardController(empName, empId);
+                        strategies.RoleStrategy strategy = new strategies.EmployeeStrategy(empName, empId);
+                        strategy.showDashboard();
                     });
                 }
 

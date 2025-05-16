@@ -72,10 +72,13 @@ public class EmployeeDashboardController {
 
 
     public EmployeeDashboardController(String employeeName, int empId) {
+        this(employeeName, empId, new EmployeeDashboardView(employeeName));
+    }
+
+    public EmployeeDashboardController(String employeeName, int empId, EmployeeDashboardView view) {
         this.employeeName = employeeName;
         this.empId = empId;
-
-        view = new EmployeeDashboardView(employeeName);
+        this.view = view;
 
         // Initialize task model with DB connection
         try {
