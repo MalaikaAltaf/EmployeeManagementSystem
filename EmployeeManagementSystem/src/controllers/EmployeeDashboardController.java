@@ -5,8 +5,11 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-
-
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import java.awt.Font;
+import java.awt.Color;
 
 import views.EmployeeDashboardView;
 import views.EmployeeLeaveView;
@@ -215,54 +218,121 @@ private void handleLogout() {
 }
 private void showAddTaskDialog() {
     JDialog dialog = new JDialog(view, "Add New Task", true);
-    dialog.setSize(400, 400);
+    dialog.setSize(450, 480);
     dialog.setLocationRelativeTo(view);
 
-    JPanel mainPanel = new JPanel();
-    mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-    mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+    JPanel mainPanel = new JPanel(new GridBagLayout());
+    mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+    mainPanel.setBackground(new Color(0xE3F2FD)); // Light blue background for the dialog
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.insets = new Insets(8, 8, 8, 8);
+    gbc.fill = GridBagConstraints.HORIZONTAL;
 
+    JLabel headerLabel = new JLabel("Add New Task");
+    headerLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
+    headerLabel.setForeground(new Color(0x29B6F6));
+    headerLabel.setHorizontalAlignment(SwingConstants.CENTER);
+    gbc.gridx = 0;
+    gbc.gridy = 0;
+    gbc.gridwidth = 2;
+    gbc.anchor = GridBagConstraints.CENTER;
+    mainPanel.add(headerLabel, gbc);
+
+    gbc.anchor = GridBagConstraints.WEST;
+    gbc.gridwidth = 1;
+
+    gbc.gridy++;
+    gbc.gridx = 0;
+    JLabel titleLabel = new JLabel("Task Title:");
+    titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+    mainPanel.add(titleLabel, gbc);
+
+    gbc.gridx = 1;
     JTextField titleField = new JTextField(20);
-    JTextArea descriptionArea = new JTextArea(3, 20);
+    titleField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+    titleField.setToolTipText("Enter the task title");
+    mainPanel.add(titleField, gbc);
+
+    gbc.gridy++;
+    gbc.gridx = 0;
+    JLabel descriptionLabel = new JLabel("Task Description:");
+    descriptionLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+    mainPanel.add(descriptionLabel, gbc);
+
+    gbc.gridx = 1;
+    JTextArea descriptionArea = new JTextArea(6, 30);
     descriptionArea.setLineWrap(true);
     descriptionArea.setWrapStyleWord(true);
-
-    JComboBox<String> statusComboBox = new JComboBox<>(new String[]{"Pending", "In Progress", "Completed"});
-    JTextField startDateField = new JTextField(LocalDate.now().toString());
-    JTextField endDateField = new JTextField(LocalDate.now().plusDays(7).toString());
-    JTextField performanceRatingField = new JTextField("5");
-
-    mainPanel.add(new JLabel("Task Title:"));
-    mainPanel.add(titleField);
-    mainPanel.add(Box.createVerticalStrut(10));
-
-    mainPanel.add(new JLabel("Task Description:"));
+    descriptionArea.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+    descriptionArea.setToolTipText("Enter the task description");
     JScrollPane descriptionScroll = new JScrollPane(descriptionArea);
-    descriptionScroll.setPreferredSize(new Dimension(350, 60));
-    mainPanel.add(descriptionScroll);
-    mainPanel.add(Box.createVerticalStrut(10));
+    descriptionScroll.setPreferredSize(new Dimension(400, 120));
+    mainPanel.add(descriptionScroll, gbc);
 
-    JPanel statusDatePanel = new JPanel(new GridLayout(2, 2, 10, 10));
-    statusDatePanel.add(new JLabel("Status:"));
-    statusDatePanel.add(statusComboBox);
-    statusDatePanel.add(new JLabel("Start Date (YYYY-MM-DD):"));
-    statusDatePanel.add(startDateField);
-    statusDatePanel.add(new JLabel("End Date (YYYY-MM-DD):"));
-    statusDatePanel.add(endDateField);
-    mainPanel.add(statusDatePanel);
-    mainPanel.add(Box.createVerticalStrut(10));
+    gbc.gridy++;
+    gbc.gridx = 0;
+    JLabel statusLabel = new JLabel("Status:");
+    statusLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+    mainPanel.add(statusLabel, gbc);
 
-    mainPanel.add(new JLabel("Performance Rating (1-10):"));
-    mainPanel.add(performanceRatingField);
-    mainPanel.add(Box.createVerticalStrut(20));
+    gbc.gridx = 1;
+    JComboBox<String> statusComboBox = new JComboBox<>(new String[]{"Pending", "In Progress", "Completed"});
+    statusComboBox.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+    statusComboBox.setToolTipText("Select the task status");
+    mainPanel.add(statusComboBox, gbc);
 
+    gbc.gridy++;
+    gbc.gridx = 0;
+    JLabel startDateLabel = new JLabel("Start Date (YYYY-MM-DD):");
+    startDateLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+    mainPanel.add(startDateLabel, gbc);
+
+    gbc.gridx = 1;
+    JTextField startDateField = new JTextField(LocalDate.now().toString());
+    startDateField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+    startDateField.setToolTipText("Enter the start date");
+    mainPanel.add(startDateField, gbc);
+
+    gbc.gridy++;
+    gbc.gridx = 0;
+    JLabel endDateLabel = new JLabel("End Date (YYYY-MM-DD):");
+    endDateLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+    mainPanel.add(endDateLabel, gbc);
+
+    gbc.gridx = 1;
+    JTextField endDateField = new JTextField(LocalDate.now().plusDays(7).toString());
+    endDateField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+    endDateField.setToolTipText("Enter the end date");
+    mainPanel.add(endDateField, gbc);
+
+    gbc.gridy++;
+    gbc.gridx = 0;
+    JLabel performanceRatingLabel = new JLabel("Performance Rating (1-10):");
+    performanceRatingLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+    mainPanel.add(performanceRatingLabel, gbc);
+
+    gbc.gridx = 1;
+    JTextField performanceRatingField = new JTextField("5");
+    performanceRatingField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+    performanceRatingField.setToolTipText("Enter the performance rating");
+    mainPanel.add(performanceRatingField, gbc);
+
+    gbc.gridy++;
+    gbc.gridx = 1;
+    gbc.anchor = GridBagConstraints.EAST;
     JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+    buttonPanel.setOpaque(false);
     JButton submitButton = new JButton("Submit");
+    submitButton.setBackground(new Color(70, 130, 180));
+    submitButton.setForeground(Color.WHITE);
+    submitButton.setFocusPainted(false);
     JButton cancelButton = new JButton("Cancel");
+    cancelButton.setBackground(new Color(220, 53, 69));
+    cancelButton.setForeground(Color.WHITE);
+    cancelButton.setFocusPainted(false);
     buttonPanel.add(submitButton);
     buttonPanel.add(cancelButton);
-
-    mainPanel.add(buttonPanel);
+    mainPanel.add(buttonPanel, gbc);
 
     dialog.add(mainPanel);
     dialog.getRootPane().setDefaultButton(submitButton);
@@ -323,6 +393,20 @@ private void refreshTaskList() {
         views.TaskPanel taskPanel = new views.TaskPanel(task.title, task.description, task.status, task.performanceRating);
         // Set edit listener for each task panel
         taskPanel.setEditListener(() -> showEditTaskDialog(task));
+        // Set delete listener for each task panel
+        taskPanel.setDeleteListener(() -> {
+            int confirm = JOptionPane.showConfirmDialog(view, "Are you sure you want to delete this task?", "Confirm Delete", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                boolean success = taskModel.deleteTask(task.taskId);
+                if (success) {
+                    JOptionPane.showMessageDialog(view, "Task deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    updatePerformanceStats();
+                    refreshTaskList();
+                } else {
+                    JOptionPane.showMessageDialog(view, "Failed to delete task.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
         view.taskListPanel.add(taskPanel);
         view.taskListPanel.add(Box.createVerticalStrut(10));
     }
@@ -332,56 +416,123 @@ private void refreshTaskList() {
 
 private void showEditTaskDialog(EmployeeTaskModel.Task task) {
     JDialog dialog = new JDialog(view, "Edit Task", true);
-    dialog.setSize(400, 400);
+    dialog.setSize(500, 450);
     dialog.setLocationRelativeTo(view);
 
-    JPanel mainPanel = new JPanel();
-    mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-    mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+    JPanel mainPanel = new JPanel(new GridBagLayout());
+    mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.insets = new Insets(8, 8, 8, 8);
+    gbc.fill = GridBagConstraints.HORIZONTAL;
 
+    JLabel headerLabel = new JLabel("Edit Task Details");
+    headerLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
+    headerLabel.setForeground(Color.BLACK);
+    headerLabel.setHorizontalAlignment(SwingConstants.CENTER);
+    gbc.gridx = 0;
+    gbc.gridy = 0;
+    gbc.gridwidth = 2;
+    gbc.anchor = GridBagConstraints.CENTER;
+    mainPanel.add(headerLabel, gbc);
+
+    mainPanel.setBackground(new Color(0xE3F2FD)); // Light blue background for the dialog
+
+    gbc.anchor = GridBagConstraints.WEST;
+    gbc.gridwidth = 1;
+
+    gbc.gridy++;
+    gbc.gridx = 0;
+    JLabel titleLabel = new JLabel("Task Title:");
+    titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+    mainPanel.add(titleLabel, gbc);
+
+    gbc.gridx = 1;
     JTextField titleField = new JTextField(task.title, 20);
-    JTextArea descriptionArea = new JTextArea(task.description, 3, 20);
+    titleField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+    titleField.setToolTipText("Enter the task title");
+    mainPanel.add(titleField, gbc);
+
+    gbc.gridy++;
+    gbc.gridx = 0;
+    JLabel descriptionLabel = new JLabel("Task Description:");
+    descriptionLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+    mainPanel.add(descriptionLabel, gbc);
+
+    gbc.gridx = 1;
+    JTextArea descriptionArea = new JTextArea(task.description, 6, 30);
     descriptionArea.setLineWrap(true);
     descriptionArea.setWrapStyleWord(true);
+    descriptionArea.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+    descriptionArea.setToolTipText("Enter the task description");
+    JScrollPane descriptionScroll = new JScrollPane(descriptionArea);
+    descriptionScroll.setPreferredSize(new Dimension(400, 120));
+    mainPanel.add(descriptionScroll, gbc);
 
+    gbc.gridy++;
+    gbc.gridx = 0;
+    JLabel statusLabel = new JLabel("Status:");
+    statusLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+    mainPanel.add(statusLabel, gbc);
+
+    gbc.gridx = 1;
     JComboBox<String> statusComboBox = new JComboBox<>(new String[]{"Pending", "In Progress", "Completed"});
     statusComboBox.setSelectedItem(task.status);
+    statusComboBox.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+    statusComboBox.setToolTipText("Select the task status");
+    mainPanel.add(statusComboBox, gbc);
 
+    gbc.gridy++;
+    gbc.gridx = 0;
+    JLabel startDateLabel = new JLabel("Start Date (YYYY-MM-DD):");
+    startDateLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+    mainPanel.add(startDateLabel, gbc);
+
+    gbc.gridx = 1;
     JTextField startDateField = new JTextField(task.startDate.toString());
+    startDateField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+    startDateField.setToolTipText("Enter the start date");
+    mainPanel.add(startDateField, gbc);
+
+    gbc.gridy++;
+    gbc.gridx = 0;
+    JLabel endDateLabel = new JLabel("End Date (YYYY-MM-DD):");
+    endDateLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+    mainPanel.add(endDateLabel, gbc);
+
+    gbc.gridx = 1;
     JTextField endDateField = new JTextField(task.endDate.toString());
+    endDateField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+    endDateField.setToolTipText("Enter the end date");
+    mainPanel.add(endDateField, gbc);
+
+    gbc.gridy++;
+    gbc.gridx = 0;
+    JLabel performanceRatingLabel = new JLabel("Performance Rating (1-10):");
+    performanceRatingLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+    mainPanel.add(performanceRatingLabel, gbc);
+
+    gbc.gridx = 1;
     JTextField performanceRatingField = new JTextField(String.valueOf(task.performanceRating));
+    performanceRatingField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+    performanceRatingField.setToolTipText("Enter the performance rating");
+    mainPanel.add(performanceRatingField, gbc);
 
-    mainPanel.add(new JLabel("Task Title:"));
-    mainPanel.add(titleField);
-    mainPanel.add(Box.createVerticalStrut(10));
-
-    mainPanel.add(new JLabel("Task Description:"));
-    JScrollPane descriptionScroll = new JScrollPane(descriptionArea);
-    descriptionScroll.setPreferredSize(new Dimension(350, 60));
-    mainPanel.add(descriptionScroll);
-    mainPanel.add(Box.createVerticalStrut(10));
-
-    JPanel statusDatePanel = new JPanel(new GridLayout(2, 2, 10, 10));
-    statusDatePanel.add(new JLabel("Status:"));
-    statusDatePanel.add(statusComboBox);
-    statusDatePanel.add(new JLabel("Start Date (YYYY-MM-DD):"));
-    statusDatePanel.add(startDateField);
-    statusDatePanel.add(new JLabel("End Date (YYYY-MM-DD):"));
-    statusDatePanel.add(endDateField);
-    mainPanel.add(statusDatePanel);
-    mainPanel.add(Box.createVerticalStrut(10));
-
-    mainPanel.add(new JLabel("Performance Rating (1-10):"));
-    mainPanel.add(performanceRatingField);
-    mainPanel.add(Box.createVerticalStrut(20));
-
+    gbc.gridy++;
+    gbc.gridx = 1;
+    gbc.anchor = GridBagConstraints.EAST;
     JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+    buttonPanel.setOpaque(false);
     JButton submitButton = new JButton("Update");
+    submitButton.setBackground(new Color(70, 130, 180));
+    submitButton.setForeground(Color.WHITE);
+    submitButton.setFocusPainted(false);
     JButton cancelButton = new JButton("Cancel");
+    cancelButton.setBackground(new Color(220, 53, 69));
+    cancelButton.setForeground(Color.WHITE);
+    cancelButton.setFocusPainted(false);
     buttonPanel.add(submitButton);
     buttonPanel.add(cancelButton);
-
-    mainPanel.add(buttonPanel);
+    mainPanel.add(buttonPanel, gbc);
 
     dialog.add(mainPanel);
     dialog.getRootPane().setDefaultButton(submitButton);

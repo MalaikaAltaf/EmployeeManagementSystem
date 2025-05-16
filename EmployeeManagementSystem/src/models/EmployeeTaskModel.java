@@ -29,6 +29,18 @@ public class EmployeeTaskModel {
         }
     }
 
+    public boolean deleteTask(int taskId) {
+        String sql = "DELETE FROM employee_tasks WHERE task_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, taskId);
+            int rows = stmt.executeUpdate();
+            return rows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public boolean updateTask(int taskId, String title, String description, String status, Date startDate, Date endDate, int performanceRating) {
         String sql = "UPDATE employee_tasks SET title = ?, description = ?, status = ?, start_date = ?, end_date = ?, performance_rating = ? WHERE task_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
