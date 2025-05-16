@@ -12,7 +12,7 @@ public class SalaryModel {
         ArrayList<String[]> salaryList = new ArrayList<>();
         String query = "SELECT base_salary, bonuses, deductions, total_salary, payment_date " +
                        "FROM salary WHERE emp_id = ? ORDER BY payment_date DESC";
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, empId);
@@ -39,7 +39,7 @@ public class SalaryModel {
         ArrayList<String[]> salaryList = new ArrayList<>();
         String query = "SELECT base_salary, bonuses, deductions, total_salary, payment_date " +
                        "FROM salary WHERE emp_id = ? AND payment_date BETWEEN ? AND ? ORDER BY payment_date DESC";
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, empId);
@@ -68,7 +68,7 @@ public class SalaryModel {
         String[] salaryData = null;
         String query = "SELECT base_salary, bonuses, deductions, total_salary FROM salary WHERE emp_id = ? AND payment_date = ?";
         
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, empId);
@@ -125,7 +125,7 @@ public class SalaryModel {
         ArrayList<String[]> salaryList = new ArrayList<>();
         String query = "SELECT base_salary, bonuses, deductions, total_salary, payment_date " +
                        "FROM salary WHERE emp_id = ? AND status = ? ORDER BY payment_date DESC";
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, empId);

@@ -9,7 +9,7 @@ public class AdminSalaryModel {
     // Get employee id by username (assuming username is unique)
     public Integer getEmpIdByUsername(String username) {
         String query = "SELECT emp_id FROM employee WHERE username = ?";
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, username);
             ResultSet rs = stmt.executeQuery();
@@ -24,7 +24,7 @@ public class AdminSalaryModel {
 
     public boolean addSalary(int empId, double baseSalary, double bonuses, double deductions, double totalSalary, String paymentDate) {
         String query = "INSERT INTO salary (emp_id, base_salary, bonuses, deductions, total_salary, payment_date) VALUES (?, ?, ?, ?, ?, ?)";
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, empId);
             stmt.setDouble(2, baseSalary);
@@ -49,7 +49,7 @@ public class AdminSalaryModel {
                        "JOIN employee e ON s.emp_id = e.emp_id " +
                        "ORDER BY s.payment_date DESC";
 
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query);
              ResultSet rs = stmt.executeQuery()) {
 

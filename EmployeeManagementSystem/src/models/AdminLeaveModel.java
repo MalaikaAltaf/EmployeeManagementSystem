@@ -8,7 +8,7 @@ public class AdminLeaveModel {
     private Connection connection;
 
     public AdminLeaveModel() {
-        this.connection = DBConnection.getConnection(); // Use your shared DB connection
+        this.connection = DBConnection.getInstance().getConnection(); // Use your shared DB connection
     }
 
     public List<Object[]> getLeavesByStatus(String status) {

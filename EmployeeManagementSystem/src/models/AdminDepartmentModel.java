@@ -10,7 +10,7 @@ public class AdminDepartmentModel {
         List<String> departments = new ArrayList<>();
         String query = "SELECT dept_name FROM department ORDER BY dept_name ASC";
 
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = DBConnection.getInstance().getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
 
@@ -27,7 +27,7 @@ public class AdminDepartmentModel {
     public void addDepartment(String department) {
         String query = "INSERT INTO department (dept_name) VALUES (?)";
 
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, department);
@@ -41,7 +41,7 @@ public class AdminDepartmentModel {
     public void deleteDepartment(String department) {
         String query = "DELETE FROM department WHERE dept_name = ?";
 
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, department);
@@ -56,7 +56,7 @@ public class AdminDepartmentModel {
         List<String> results = new ArrayList<>();
         String query = "SELECT dept_name FROM department WHERE dept_name LIKE ?";
 
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, "%" + keyword + "%");

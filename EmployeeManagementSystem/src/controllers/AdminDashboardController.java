@@ -9,9 +9,17 @@ public class AdminDashboardController {
     private AdminDashboard adminView;
     private JPanel mainPanel;
 
+    private views.ChatView chatView;
+    private controllers.ChatController chatController;
+
     public AdminDashboardController(AdminDashboard adminView) {
         this.adminView = adminView;
         this.mainPanel = adminView.getMainPanel();
+
+        // Initialize chat view and controller with identifier "Admin"
+        chatView = new views.ChatView();
+        chatController = new controllers.ChatController(chatView, "Admin");
+        mainPanel.add(chatView);
 
         addListeners();
 
@@ -65,7 +73,7 @@ public class AdminDashboardController {
     
 
     private void showChatPanel() {
-        ChatView chatView = new ChatView();
+        // Show the chatView panel
         setMainPanelContent(chatView);
     }
 
@@ -76,19 +84,23 @@ public class AdminDashboardController {
         setMainPanelContent(salaryView);
     }
 
-    private void logout() {
-        int confirm = JOptionPane.showConfirmDialog(
-            adminView,
-            "Are you sure you want to log out?",
-            "Logout Confirmation",
-            JOptionPane.YES_NO_OPTION
-        );
+private void logout() {
+    int confirm = JOptionPane.showConfirmDialog(
+        adminView,
+        "Are you sure you want to log out?",
+        "Logout Confirmation",
+        JOptionPane.YES_NO_OPTION
+    );
 
-        if (confirm == JOptionPane.YES_OPTION) {
-            adminView.dispose();
-            // new LoginView().setVisible(true); // Uncomment when LoginView is implemented
-        }
+    if (confirm == JOptionPane.YES_OPTION) {
+        adminView.dispose();
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            views.LoginView loginView = new views.LoginView();
+            new controllers.LoginController(loginView);
+            loginView.setVisible(true);
+        });
     }
+}
 
     private void setMainPanelContent(JPanel panel) {
         mainPanel.removeAll();

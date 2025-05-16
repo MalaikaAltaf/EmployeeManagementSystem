@@ -8,7 +8,7 @@ public class LeaveModel {
 
     public boolean submitLeaveRequest(int empId, String startDate, String endDate, String reason) {
         String query = "INSERT INTO leave_requests (emp_id, start_date, end_date, reason) VALUES (?, ?, ?, ?)";
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, empId);
@@ -28,7 +28,7 @@ public class LeaveModel {
         List<String[]> requests = new ArrayList<>();
         String query = "SELECT start_date, end_date, reason, status, request_date FROM leave_requests WHERE emp_id = ?";
 
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, empId);

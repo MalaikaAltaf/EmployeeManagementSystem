@@ -243,6 +243,12 @@ private void handleLogout() {
         timer.stop();
         view.dispose();
         System.out.println("Logged out!");
+        // Show login page
+javax.swing.SwingUtilities.invokeLater(() -> {
+    views.LoginView loginView = new views.LoginView();
+    new controllers.LoginController(loginView);
+    loginView.setVisible(true);
+});
     }
 }
 private void showAddTaskDialog() {

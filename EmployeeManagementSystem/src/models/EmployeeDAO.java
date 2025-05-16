@@ -10,7 +10,7 @@ public class EmployeeDAO {
     public boolean addEmployee(Employee emp) {
         String query = "INSERT INTO employee (first_name, last_name, email, phone, department, designation, date_joined, salary, username, password, profile_pic) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setString(1, emp.getFirstName());
@@ -38,7 +38,7 @@ public class EmployeeDAO {
     public boolean deleteEmployee(String username) {
         String query = "DELETE FROM employee WHERE username = ?";
 
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setString(1, username);

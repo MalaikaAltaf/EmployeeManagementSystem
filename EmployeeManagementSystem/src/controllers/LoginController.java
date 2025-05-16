@@ -30,7 +30,7 @@ public class LoginController {
         }
 
         try {
-            Connection conn = DBConnection.getConnection();
+            Connection conn = DBConnection.getInstance().getConnection();
             String table = role.equals("Admin") ? "admin" : "employee";
             String query = "SELECT * FROM " + table + " WHERE username = ? AND password = ?";
             PreparedStatement stmt = conn.prepareStatement(query);

@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 public class AdminSettingsModel {
 
     public boolean verifyCurrentPassword(String username, String currentPassword) {
-        try (Connection conn = DBConnection.getConnection()) {
+        try (Connection conn = DBConnection.getInstance().getConnection()) {
             String query = "SELECT password FROM admin WHERE username = ?";
             PreparedStatement stmt = conn.prepareStatement(query);
             stmt.setString(1, username);
@@ -23,7 +23,7 @@ public class AdminSettingsModel {
     }
 
     public boolean updatePassword(String username, String newPassword) {
-        try (Connection conn = DBConnection.getConnection()) {
+        try (Connection conn = DBConnection.getInstance().getConnection()) {
             String query = "UPDATE admin SET password = ? WHERE username = ?";
             PreparedStatement stmt = conn.prepareStatement(query);
             stmt.setString(1, newPassword);
