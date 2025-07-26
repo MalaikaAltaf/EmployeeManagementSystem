@@ -1,6 +1,4 @@
-Absolutely! Here's a complete and professional `README.md` file for your **Employee Management System** semester project on GitHub:
 
----
 
 ````markdown
 # 🧑‍💼 Employee Management System – Java + MySQL
@@ -49,7 +47,10 @@ A desktop-based Employee Management System built as a semester project using **J
 |-----------------|--------------------|
 
 
-[<img width="1915" height="1025" alt="image" src="https://github.com/user-attachments/assets/800c6a89-031a-466b-a5f0-d15a39c6fcec" />](https://github.com/MalaikaAltaf/EmployeeManagementSystem/blob/main/Capture.PNG)
+![Admin Dashboard](Capture.PNG)
+
+![Employee Dashboard](Capture2.PNG)
+
 
 
 
