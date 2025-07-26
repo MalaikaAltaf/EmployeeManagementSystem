@@ -49,11 +49,10 @@ A desktop-based Employee Management System built as a semester project using **J
 |-----------------|--------------------|
 
 
-<img width="1915" height="1025" alt="image" src="https://github.com/user-attachments/assets/800c6a89-031a-466b-a5f0-d15a39c6fcec" />
+[<img width="1915" height="1025" alt="image" src="https://github.com/user-attachments/assets/800c6a89-031a-466b-a5f0-d15a39c6fcec" />](https://github.com/MalaikaAltaf/EmployeeManagementSystem/blob/main/Capture.PNG)
 
 
----
-<img width="1920" height="1030" alt="image" src="https://github.com/user-attachments/assets/2766885d-2243-4130-be76-b0b28dbb721d" />
+
 
 
 ## 🛠️ Installation & Setup
