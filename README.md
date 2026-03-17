@@ -1,6 +1,6 @@
 
 
-# 🧑‍💼 Employee Management System – Java + MySQL
+# Employee Management System – Java + MySQL
 
 A desktop-based Employee Management System built as a semester project using **Java (Swing, AWT)** and **MySQL**, following the **MVC architecture**. This system supports both Admin and Employee roles and streamlines HR operations like profile management, time tracking, salary viewing, leave requests, and real-time chat.
 
